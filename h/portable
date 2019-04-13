@@ -1,0 +1,29 @@
+/*******************************************************************
+ * File:     portable
+ * Purpose:  Interfaces back to the core portable module
+ * Author:   Justin Fletcher
+ * Date:     04 Sep 2003
+ ******************************************************************/
+
+#ifndef PORTABLE_H
+#define PORTABLE_H
+
+typedef enum varop_e {
+  varop_ok,
+  varop_failed,
+  varop_noread,
+  varop_nowrite,
+  varop_badvalue,
+  varop_invalid
+} varop_t;
+
+/*************************************************** Gerph *********
+ Function:     state_changed
+ Description:  Called by the implementation monitor code when the
+               state of the device changes
+ Parameters:   flags = the new flags
+ Returns:      none
+ ******************************************************************/
+void state_changed(unsigned long flags);
+
+#endif

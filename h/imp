@@ -1,0 +1,158 @@
+/*******************************************************************
+ * File:     imp
+ * Purpose:  Implementation of the Portable module - non-general
+ *           code
+ * Author:   Justin Fletcher
+ * Date:     04 Sep 2003
+ ******************************************************************/
+
+#ifndef IMP_H
+#define IMP_H
+
+#include "Portable.h"
+#include "PortableVars.h"
+#include "kernel.h"
+
+/*************************************************** Gerph *********
+ Function:     imp_checkhardware
+ Description:  Check whether the module is valid for this hardware
+               configuration.
+ Parameters:   none
+ Returns:      1 if we can function on this hardware, 0 if we cannot
+ ******************************************************************/
+int imp_checkhardware(void);
+
+/*************************************************** Gerph *********
+ Function:     imp_initialcontrol
+ Description:  Return the initial value of the 'control' variable
+ Parameters:   none
+ Returns:      initial control value
+ ******************************************************************/
+unsigned long imp_initialcontrol(void);
+
+/*************************************************** Gerph *********
+ Function:     imp_initmonitor
+ Description:  Initialise any monitoring vectors we need to claim
+ Parameters:   none
+ Returns:      none
+ ******************************************************************/
+void imp_initmonitor(void);
+
+/*************************************************** Gerph *********
+ Function:     imp_finalmonitor
+ Description:  Finalise by releasing any vectors claimed for monitoring
+ Parameters:   none
+ Returns:      none
+ ******************************************************************/
+void imp_finalmonitor(void);
+
+/*************************************************** Gerph *********
+ Function:     imp_speed
+ Description:  Change the speed of the machine
+ Parameters:   oldspeed = the old speed before this change
+               speed = new speed to apply :
+                      speed_fast = fast
+                      speed_slow = slow
+ Returns:      updated speed
+ ******************************************************************/
+int imp_speed(int oldspeed, int speed);
+
+/*************************************************** Gerph *********
+ Function:     imp_controlcheck
+ Description:  Check that the change in control parameters is acceptable
+ Parameters:   current = the current flags for information
+               change = the flags which are changing state
+               on = 0 if those flags will be set to 'off'
+                    1 if those flags will be set to 'on'
+ Returns:      new change flags
+ ******************************************************************/
+unsigned long imp_controlcheck(unsigned long current, unsigned long change, int on);
+
+/*************************************************** Gerph *********
+ Function:     imp_control
+ Description:  Control the power parameters
+ Parameters:   current = the current flags for information
+               change = the flags which are changing state
+               on = 0 if those flags should be set to 'off'
+                    1 if those flags should be set to 'on'
+ Returns:      none
+ ******************************************************************/
+void imp_control(unsigned long current, unsigned long change, int on);
+
+/*************************************************** Gerph *********
+ Function:     imp_readbmuvar
+ Description:  Read information about the Battery Management Unit
+ Parameters:   var = the variable to read
+               valp-> where to store the value
+ Returns:      operation state :
+                 varop_ok - variable changed
+                 varop_failed - value and variable valid, but BMU failed
+                                to accept the change (probably hardware
+                                failure)
+                 varop_noread - variable is write only
+                 varop_nowrite - variable is read only
+                 varop_badvalue - the value is not acceptable for this variable
+                 varop_invalid - the variable specified is not understood
+ ******************************************************************/
+varop_t imp_readbmuvar(int var, int *valp);
+
+/*************************************************** Gerph *********
+ Function:     imp_writebmuvar
+ Description:  Write to the Battery Management Unit
+ Parameters:   var = the variable to write
+               val = value to write
+ Returns:      operation state :
+                 varop_ok - variable changed
+                 varop_failed - value and variable valid, but BMU failed
+                                to accept the change (probably hardware
+                                failure)
+                 varop_noread - variable is write only
+                 varop_nowrite - variable is read only
+                 varop_badvalue - the value is not acceptable for this variable
+                 varop_invalid - the variable specified is not understood
+ ******************************************************************/
+varop_t imp_writebmuvar(int var, int val);
+
+/*************************************************** Gerph *********
+ Function:     imp_commandbmu
+ Description:  Issue a command to the Battery Management Unit
+ Parameters:   cmd = the command issued
+               r-> the registers passed on entry
+ Returns:      1 if successful, 0 if an invalid command
+ ******************************************************************/
+int imp_commandbmu(int cmd, _kernel_swi_regs *r);
+
+/*************************************************** Gerph *********
+ Function:     imp_readfeatures
+ Description:  Read the features of this implementation
+ Parameters:   none
+ Returns:      feature flags
+ ******************************************************************/
+unsigned long imp_readfeatures(void);
+
+/*************************************************** Gerph *********
+ Function:     imp_idle
+ Description:  Stop the processor temporarily, waking up as soon as
+               any external stimulus (interrupt, etc)
+ Parameters:   none
+ Returns:      none
+ ******************************************************************/
+void imp_idle(void);
+
+/*************************************************** Gerph *********
+ Function:     imp_stop
+ Description:  Freeze the machine
+ Parameters:   none
+ Returns:      reason for wake up
+ ******************************************************************/
+int imp_stop(void);
+
+/*************************************************** Gerph *********
+ Function:     imp_status
+ Description:  Reads the status of the portable device
+ Parameters:   none
+ Returns:      status flags for the machine
+ ******************************************************************/
+unsigned long imp_status(void);
+
+#endif

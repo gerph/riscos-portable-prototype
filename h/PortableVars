@@ -1,0 +1,115 @@
+/* AUTOMATICALLY generated header, from hdr.Portable */
+
+#ifndef RISCOS_PortableVars_H
+#define RISCOS_PortableVars_H
+
+
+#define PortableSpeed_Slow               0x0
+#define PortableSpeed_Fast               0x1
+
+#define PortableControl_EconetEnable     0x1
+#define PortableControl_LCDEnable        0x2
+#define PortableControl_VideoEnable      0x4
+#define PortableControl_SerialEnable     0x8 /* enable serial buffers and oscillator */
+
+#define PortableControl_DualEnable       0x10
+#define PortableControl_ClockBits        0x60 /* control which clock is fed to VIDC */
+#define PortableControl_ExtClock         0x0 /* use external clock (from IOEB) */
+#define PortableControl_Crys2Clock       0x20 /* use crystal clock divided by 2 */
+#define PortableControl_CrysClock        0x40 /* use crystal clock */
+#define PortableControl_InvertClock      0x80
+
+#define PortableControl_BacklightEnable  0x100
+
+#define PortableControl_ExtraLines       0x200
+#define PortableControl_ExtraLines1      0x0
+#define PortableControl_ExtraLines2      0x200
+
+#define PortableControl_DRAMs            0x400
+#define PortableControl_DRAMs1           0x0
+#define PortableControl_DRAMs2           0x400
+
+#define PortableControl_SoundEnable      0x800 /* enable filters and amplifiers (new for Stork) */
+#define PortableControl_PCMCIAEnable     0x1000 /* enable PCMCIA hardware (new for Stork) */
+#define PortableControl_ParallelEnable   0x2000 /* enable parallel port (new for Stork) */
+#define PortableControl_FDCEnable        0x4000 /* enable FDC oscillator */
+#define PortableControl_IDEEnable        0x8000 /* enable IDE hard disc (new for Stork) */
+
+#define PortableControl_LCDInvert        0x10000
+#define PortableControl_IntTBallEnable   0x20000 /*internal trackerball enabled } mutually */
+#define PortableControl_ExtMouseEnable   0x40000 /*external mouse port enabled  } exclusive */
+#define PortableControl_ExtPowerEnable   0x80000 /*power to external keyboard and mouse */
+
+
+/* BMU flags */
+
+#define PortableBMUF_ChargerPresent      0x80
+#define PortableBMUF_BatteryPresent      0x40
+#define PortableBMUF_ChargeKnown         0x20
+#define PortableBMUF_ChargeFault         0x10
+#define PortableBMUF_Threshold_1         0x8 /*Battery low  - warn user */
+#define PortableBMUF_Threshold_2         0x4 /*Battery flat - shutdown now */
+#define PortableBMUF_LidOpen             0x2
+#define PortableBMUF_Threshold_3         0x1 /*New for Stork  ;Battery charged */
+
+
+/* BMU commands */
+
+#define PortableBMU_Min_Command          0x1
+#define PortableBMUC_RemovePower         0x1
+#define PortableBMUC_SetPartCharge       0x2
+#define PortableBMUC_SetFullCharge       0x3
+#define PortableBMUC_SetAutostart        0x4
+#define PortableBMUC_DisconnectCharger   0x5 /*New for Stork */
+#define PortableBMUC_ConnectCharger      0x6 /*New for Stork */
+#define PortableBMUC_DisablePMInts       0x7 /*New for Stork  ; Disable } reporting of battery */
+#define PortableBMUC_EnablePMInts        0x8 /*New for Stork  ; Enable  } state by interrupt */
+
+#define PortableBMU_Num_Commands         0x9
+
+
+/* BMU variables */
+
+#define PortableBMU_Min_Variable         0x0
+#define PortableBMUV_VersionNumber       0x0 /* 0 */
+#define PortableBMUV_NominalCapacity     0x1 /* 1 */
+#define PortableBMUV_MeasuredCapacity    0x2 /* 2 */
+#define PortableBMUV_UsedCapacity        0x3 /* 3 */
+#define PortableBMUV_UsableCapacity      0x4 /* 4 */
+#define PortableBMUV_Reserved            0x5 /* 5 */
+#define PortableBMUV_ChargeEstimate      0x6 /* 6 */
+#define PortableBMUV_Voltage             0x7 /* 7 */
+#define PortableBMUV_Current             0x8 /* 8 */
+#define PortableBMUV_Temperature         0x9 /* 9 */
+#define PortableBMUV_Flags               0xa /*10 */
+#define PortableBMUV_ChargeRate          0xb /*11 */
+/* */
+/* Stork variables */
+/* */
+#define PortableBMUVar_ChargeCurrent     0xc /*12 */
+#define PortableBMUVar_DischargeCurrent  0xd /*13 */
+#define PortableBMUVar_Voltage           0xe /*14 */
+#define PortableBMUVar_Temperature1      0xf /*15 */
+#define PortableBMUVar_Temperature2      0x10 /*16 */
+#define PortableBMUVar_ChargeLevel       0x11 /*17 */
+#define PortableBMUVar_StatusFlags       0x12 /*18 */
+#define PortableBMUVar_InputSignals      0x13 /*19 */
+#define PortableBMUVar_BatteryCapacity   0x14 /*20 */
+/* */
+#define PortableBMU_Num_Variables        0x15
+
+#define PortableFeature_Speed            0x1
+#define PortableFeature_Idle             0x10
+#define PortableFeature_Stop             0x20
+
+#define PortableWake_NoReason            0x0
+#define PortableWake_Keyboard            0x1
+#define PortableWake_Timer               0x2
+
+#define PortableStatus_DocStationConnected  0x1
+#define PortableStatus_PrinterFloppy     0x2
+#define PortableStatus_TrackerBallConnected 0x4
+#define PortableStatus_LCDOn             0x8
+
+
+#endif

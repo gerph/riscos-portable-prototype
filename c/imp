@@ -1,0 +1,300 @@
+/*******************************************************************
+ * File:     imp
+ * Purpose:  Implementation of the Portable module - non-general
+ *           code
+ * Author:   Justin Fletcher
+ * Date:     04 Sep 2003
+ ******************************************************************/
+
+#include <stdlib.h>
+#include "swis.h"
+#include "modhead.h"
+#include "portable.h"
+#include "PortableVars.h"
+
+/*************************************************** Gerph *********
+ Function:     imp_checkhardware
+ Description:  Check whether the module is valid for this hardware
+               configuration.
+ Parameters:   none
+ Returns:      1 if we can function on this hardware, 0 if we cannot
+ ******************************************************************/
+int imp_checkhardware(void)
+{
+  /* Usually you would probe your power management functions to see
+     if the right sort of hardware was present. If not then we cannot
+     start. */
+
+  /* Dummy implementation claims it can always function */
+  return 1;
+}
+
+/*************************************************** Gerph *********
+ Function:     imp_initialcontrol
+ Description:  Return the initial value of the 'control' variable
+ Parameters:   none
+ Returns:      initial control value
+ ******************************************************************/
+unsigned long imp_initialcontrol(void)
+{
+  /* You should only return the devices that you know are actually
+     available and powered. This may mean calling other components
+     if power control is distributed through a number of devices
+   */
+
+  /* Dummy implementation claims that RiscPC like hardware is powered */
+  int econet_present = _swix(OS_Module,_INR(0,1),18,"Econet")==NULL;
+  return
+    (econet_present ? PortableControl_EconetEnable : 0x0) |
+    /* PortableControl_LCDEnable |       /-* No LCD -*/
+    PortableControl_VideoEnable |     /* Video enabled */
+    PortableControl_SerialEnable |    /* Serial enabled */
+    /* PortableControl_DualEnable |      /-* No dual panel -*/
+    PortableControl_ExtClock | /* Pretend it's an external clock */
+    /* PortableControl_InvertClock |     /-* Clock isn't inverted -*/
+    /* PortableControl_BacklightEnable | /-* No backlight -*/
+    PortableControl_ExtraLines1 |     /* Pretend there's 1 extra line */
+    PortableControl_DRAMs1 |          /* No dual panel really, so just 1 DRAM */
+    PortableControl_SoundEnable |     /* Sound is enabled */
+    /* PortableControl_PCMCIAEnable |    /-* No PCMCIA -*/
+    PortableControl_ParallelEnable |  /* Parallel enabled */
+    PortableControl_FDCEnable |       /* We have floppies */
+    PortableControl_IDEEnable |       /* We have IDE */
+    /* PortableControl_LCDInvert |       /-* No LCD inversion -*/
+    /* PortableControl_IntTBallEnable |  /-* No tracker ball -*/
+    PortableControl_ExtMouseEnable |  /* External mouse present */
+    PortableControl_ExtPowerEnable |  /* Keyboard and mouse are powered */
+    0x0;
+}
+
+/*************************************************** Gerph *********
+ Function:     imp_initmonitor
+ Description:  Initialise any monitoring vectors we need to claim
+ Parameters:   none
+ Returns:      none
+ ******************************************************************/
+void imp_initmonitor(void)
+{
+  /* Usually we'd claim a device vector to trap interrupts from the BMU
+     or use a CallEvery to poll the device every second or so. When the
+     monitoring routine detects a change it will call state_changed to
+     notify RISC OS clients of the new state. */
+  /* Dummy implementation does nothing */
+  return;
+}
+
+/*************************************************** Gerph *********
+ Function:     imp_finalmonitor
+ Description:  Finalise by releasing any vectors claimed for monitoring
+ Parameters:   none
+ Returns:      none
+ ******************************************************************/
+void imp_finalmonitor(void)
+{
+  /* Release the vectors we claimed in imp_initmonitor */
+  /* Dummy implementation does nothing */
+  return;
+}
+
+/*************************************************** Gerph *********
+ Function:     imp_speed
+ Description:  Change the speed of the machine
+ Parameters:   oldspeed = the old speed before this change
+               speed = new speed to apply :
+                      speed_fast = fast
+                      speed_slow = slow
+ Returns:      updated speed
+ ******************************************************************/
+int imp_speed(int oldspeed, int speed)
+{
+  /* Usually we'd apply the speed change here and only fault it if
+     there was some reason that the processor speed couldn't be
+     reduced */
+  /* We can't change the speed, so we just say that it's fast */
+  return PortableSpeed_Fast;
+}
+
+/*************************************************** Gerph *********
+ Function:     imp_controlcheck
+ Description:  Check that the change in control parameters is acceptable
+ Parameters:   current = the current flags for information
+               change = the flags which are changing state
+               on = 0 if those flags will be set to 'off'
+                    1 if those flags will be set to 'on'
+ Returns:      new change flags
+ ******************************************************************/
+unsigned long imp_controlcheck(unsigned long current, unsigned long change, int on)
+{
+  /* We need to check that the flags that have been requested to be changed
+     can actually be changed. If, for example, we can't change the power to
+     the Video output then we would always clear that bit, regardless of
+     whether the 'on' or 'off' state was set. If, on the other hand, we
+     can only change the power to the Video output if there is external
+     power connected, then we would have to validate this before we accepted
+     the change.
+     You should never be asked to power a device which is already powered
+     or remove power from a device which is not powered.
+   */
+  /* This implementation allows NO changes to anything, so we clear all the
+     change bits and return 0 */
+  return 0;
+}
+
+/*************************************************** Gerph *********
+ Function:     imp_control
+ Description:  Control the power parameters
+ Parameters:   current = the current flags for information
+               change = the flags which are changing state
+               on = 0 if those flags should be set to 'off'
+                    1 if those flags should be set to 'on'
+ Returns:      none
+ ******************************************************************/
+void imp_control(unsigned long current, unsigned long change, int on)
+{
+  /* We assume that imp_controlcheck/imp_controlcheck have validated
+     the flags that we're about to change. We affect the change and
+     return.
+   */
+  /* This implementation doesn't do anything, so we just return now */
+  return;
+}
+
+/*************************************************** Gerph *********
+ Function:     imp_readbmuvar
+ Description:  Read information about the Battery Management Unit
+ Parameters:   var = the variable to read
+               valp-> where to store the value
+ Returns:      operation state :
+                 varop_ok - variable changed
+                 varop_failed - value and variable valid, but BMU failed
+                                to accept the change (probably hardware
+                                failure)
+                 varop_noread - variable is write only
+                 varop_nowrite - variable is read only
+                 varop_badvalue - the value is not acceptable for this variable
+                 varop_invalid - the variable specified is not understood
+ ******************************************************************/
+varop_t imp_readbmuvar(int var, int *valp)
+{
+  /* Usually you would have a switch statement here and you would accept
+     or reject variables through this. Probably a table-based implementation
+     could also be used if a direct mapping from variables to BMU requests
+     can be made. */
+  /* This dummy implementation understands nothing */
+  return varop_invalid;
+}
+
+/*************************************************** Gerph *********
+ Function:     imp_writebmuvar
+ Description:  Write to the Battery Management Unit
+ Parameters:   var = the variable to write
+               val = value to write
+ Returns:      operation state :
+                 varop_ok - variable changed
+                 varop_failed - value and variable valid, but BMU failed
+                                to accept the change (probably hardware
+                                failure)
+                 varop_noread - variable is write only
+                 varop_nowrite - variable is read only
+                 varop_badvalue - the value is not acceptable for this variable
+                 varop_invalid - the variable specified is not understood
+ ******************************************************************/
+varop_t imp_writebmuvar(int var, int val)
+{
+  /* Usually you would have a switch statement here and you would accept
+     or reject variables through this. Probably a table-based implementation
+     could also be used if a direct mapping from variables to BMU requests
+     can be made. */
+  /* This dummy implementation understands nothing */
+  return varop_invalid;
+}
+
+/*************************************************** Gerph *********
+ Function:     imp_commandbmu
+ Description:  Issue a command to the Battery Management Unit
+ Parameters:   cmd = the command issued
+               r-> the registers passed on entry
+ Returns:      1 if successful, 0 if an invalid command
+ ******************************************************************/
+int imp_commandbmu(int cmd, _kernel_swi_regs *r)
+{
+  /* The command most likely to be used here would be the command to remove
+     power. We would reject those commands which we are incapable of
+     servicing. */
+  /* Dummy implementation does nothing */
+  return 0;
+}
+
+/*************************************************** Gerph *********
+ Function:     imp_readfeatures
+ Description:  Read the features of this implementation
+ Parameters:   none
+ Returns:      feature flags
+ ******************************************************************/
+unsigned long imp_readfeatures(void)
+{
+  /* Here we return what sort of operations we can perform. Although the
+     SWIs are present for some of these calls we may not necessarily
+     support them on some hardware. In particular, it may not be possible
+     on some machines to reduce the clock speed to 'idle' the machine,
+     or to freeze the machine's state. This is where you return these
+     details.
+   */
+  /* Dummy implementation says that we can be called for 'Idle' and 'Speed'
+     only - even though we don't actually do anything - as an example */
+  return
+    PortableFeature_Speed | /* We can slow the processor */
+    PortableFeature_Idle |  /* We can hlt the processor */
+    /* PortableFeature_Stop |  /-* We cannot stop the processor -*/
+    0;
+}
+
+/*************************************************** Gerph *********
+ Function:     imp_idle
+ Description:  Stop the processor temporarily, waking up as soon as
+               any external stimulus (interrupt, etc)
+ Parameters:   none
+ Returns:      none
+ ******************************************************************/
+void imp_idle(void)
+{
+  /* Normally we'd halt the CPU here until some interrupt happened that we
+     had to service. */
+  /* Dummy implementation just returns */
+  return;
+}
+
+/*************************************************** Gerph *********
+ Function:     imp_stop
+ Description:  Freeze the machine
+ Parameters:   none
+ Returns:      reason for wake up
+ ******************************************************************/
+int imp_stop(void)
+{
+  /* We set the RAM to auto-refresh, disable hardware devices and generally
+     put the machine into a 'standby' state.
+   */
+  /* Dummy implementation returns a 'no reason' response to indicate that
+     the system returned but the reason was indeterminate */
+  return PortableWake_NoReason;
+}
+
+/*************************************************** Gerph *********
+ Function:     imp_status
+ Description:  Reads the status of the portable device
+ Parameters:   none
+ Returns:      status flags for the machine
+ ******************************************************************/
+unsigned long imp_status(void)
+{
+  /* We would return the state of equipment connected to the portable
+     device here. */
+  /* Dummy implementation just claimes we've got a floppy. */
+  return
+     /* ProtableStatus_DocStationConnected |  /-* No doc station -*/
+     PortableStatus_PrinterFloppy |
+     /* ProtableStatus_TrackerBallConnected | /-* No tracker ball -*/
+     /* ProtableStatus_LCDOn |                /-* No LCD - external video -*/
+     0;
+}

@@ -1,0 +1,81 @@
+; CMHG file for Portable module
+
+; You should give your module a sensible name which describes its purpose
+; both accurately and concisely. You must register any module names you use
+; if they are to be distributed.
+title-string: Portable
+
+; The help-string is the name that is displayed to the user in *Help Modules
+; and other places that a more readable name is required. You should attempt
+; to make this a readable version of the title-string, and - at worst - use
+; the same name as in the title-string. The tail message may be used to
+; indicate a variant of the module, or a copyright string.
+help-string: Portable 0.01 Skeleton
+
+; If you supply SWIs in your module, you must provide a base number at which
+; these start. Each chunk is 64 entries long and must be registered if the
+; module is going to be distributed.
+swi-chunk-base-number: &42FC0 ; allocated
+
+; If you have any error messages in your module that are returned through
+; the standard interfaces, you should use different error numbers for each,
+; starting at a base number. You should register your error bases before
+; distributing the module. Using random error numbers is dangerous.
+error-base: &b40 ; allocated
+
+; Allocating error messages within the module is more efficient than doing
+; so manually in your C code, and is less likely to pollute error number
+; space. The number is optional, and if omitted will be allocated from the
+; error chunk.
+error-identifiers: err_BadHardware(&603,"BadHard"),
+                   err_BadBMUVariable("BadBMUVar"),
+                   err_BadBMUCommand("BadBMUCmd"),
+                   err_BMUBusy("BMUBusy"),
+                   err_BadBMUVersion("BadBMUVer"),
+                   err_BMUFault("BMUFault"),
+                   err_BMUVecClaim("BMUVecClaim"),
+                   err_CantFreeze("CantFreeze"),
+                   err_FreezeFailed("FreezeFailed"),
+                   err_BMUCannotReadVariable("CannotReadBMUVar"),
+                   err_BMUCannotWriteVariable("CannotWriteBMUVar"),
+                   err_BMUValueNotValid("BMUValueInvalid"),
+                   err_BMUChangeFailed("BMUChangeFailed")
+
+; When the module is initialised, this routine will be entered. You should
+; be very careful to initialise your module safely. If anything fails, you
+; can return an error message. Finalisation code will not be called if you
+; return an error.
+initialisation-code: Mod_Init
+
+; When the module is killed, this routine will be entered. If you do not
+; wish to be killed then you should return an error and retain as much of
+; the current state as possible. Causing an abort in this routine will leave
+; a 'dead' module in the chain.
+finalisation-code: Mod_Final
+
+; Syntax and help messages may be internationalised by using a messages
+; file.
+international-help-file: "Resources:$.Resources.Portable.Messages"
+
+; The SWI decoding table lists the SWIs which the module supplies. The first
+; entry is always the SWI prefix, used on all SWIs that the module provides.
+; This should be the name of the module, or some obvious variant. You should
+; register your SWI prefixes when you register a SWI chunk. Each name entry
+; may be followed by /<entry> to use a particular routine to handle a SWI.
+;
+swi-decoding-table: Portable,
+        Speed/SWI_Speed,
+        Control/SWI_Control,
+        ReadBMUVariable/SWI_BMUVariable,
+        WriteBMUVariable/SWI_BMUVariable,
+        CommandBMU/SWI_CommandBMU,
+        ReadFeatures/SWI_ReadFeatures,
+        Idle/SWI_Idle,
+        Stop/SWI_Stop,
+        Status/SWI_Status
+
+; The module service entry will be called to process services. You are
+; strongly recommended to include the numbers of the services you wish to
+; handle.
+;service-call-handler: Mod_Service 1 2 3 4 5 6
+
