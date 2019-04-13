@@ -14,8 +14,18 @@
 #include "riscos/services.h"
 #include "riscos/events.h"
 
+/* Define this to debug this file */
+#define DEBUG
+
+#ifdef DEBUG
+#define dprintf if (1) _swix(0x104,0), printf
+#else
+#define dprintf if (0) _swix(0x104,0), printf
+#endif
+
 unsigned long speed = PortableSpeed_Fast;
 unsigned long control = 0;
+static int monitorenabled = 0;
 
 /***************************************************************************
  * Function:     Mod_Init
@@ -34,8 +44,8 @@ _kernel_oserror *Mod_Init(const char *tail, int podule_base, void *pw)
   int functional = imp_checkhardware();
   if (!functional)
     return err_BadHardware;
+  monitorenabled = 0;
   control = imp_initialcontrol();
-  imp_initmonitor();
   return NULL;
 }
 
@@ -53,7 +63,11 @@ _kernel_oserror *Mod_Init(const char *tail, int podule_base, void *pw)
  **************************************************************************/
 _kernel_oserror *Mod_Final(int fatal, int podule_base, void *pw)
 {
-  imp_finalmonitor();
+  if (monitorenabled)
+  {
+    imp_finalmonitor();
+    monitorenabled=0;
+  }
   return NULL;
 }
 
@@ -168,7 +182,35 @@ _kernel_oserror *SWI_BMUVariable(int number, _kernel_swi_regs *r,
  */
 _kernel_oserror *SWI_CommandBMU(int number, _kernel_swi_regs *r, void *pw)
 {
-  int ok = imp_commandbmu(r->r[0], r);
+  int ok;
+
+  /* First deal with the calls we can handle internally without the
+     implementation being called */
+  switch (r->r[0])
+  {
+    case PortableBMUC_DisablePMInts:
+      if (monitorenabled)
+      {
+        imp_finalmonitor();
+        monitorenabled=0;
+      }
+      ok=1;
+      break;
+
+    case PortableBMUC_EnablePMInts:
+      if (!monitorenabled)
+      {
+        imp_initmonitor();
+        monitorenabled=1;
+      }
+      ok=1;
+      break;
+
+    /* And if we can't handle it, pass on to the implementation */
+    default:
+      ok = imp_commandbmu(r->r[0], r);
+      break;
+  }
   if (!ok)
     return err_BadBMUCommand;
   return NULL;
@@ -194,12 +236,43 @@ _kernel_oserror *SWI_Idle(int number, _kernel_swi_regs *r, void *pw)
 }
 
 /*
- Portable_Idle
+ Portable_Stop
    <= R0 = reason for wake up
  */
 _kernel_oserror *SWI_Stop(int number, _kernel_swi_regs *r, void *pw)
 {
-  r->r[0] = imp_stop();
+  int failed;
+  int unclaimed;
+  _kernel_oserror *err;
+  
+  /* First check whether other people want to freeze right now */
+  err = _swix(OS_ServiceCall, _INR(1,2)|_OUT(1), Service_Portable, ServicePortable_FreezeRequest, &unclaimed);
+  if (err)
+    return err;
+  if (unclaimed)
+    return err_CantFreeze;
+  
+  /* Inform all the clients that we're freezing */
+  _swix(OS_ServiceCall, _INR(1,2), Service_Portable, ServicePortable_Freeze);
+    
+  /* Ok, it's been accepted so we want to shut down the RISC OS interfaces */
+  failed = PortableUnfreeze_Success;
+  
+  /* ... stuff */
+
+  /* Now tell the hardware to stop */
+  if (failed==PortableUnfreeze_Success)
+    r->r[0] = imp_stop();
+    
+  /* Inform all the clients that we're freezing */
+  _swix(OS_ServiceCall, _INR(1,3), Service_Portable, ServicePortable_Unfreeze, failed);
+
+  /* Now restore the RISC OS interface */
+  /* ... */
+  
+  if (failed)
+    return err_FreezeFailed;
+
   return NULL;
 }
 

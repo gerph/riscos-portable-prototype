@@ -50,7 +50,7 @@
 #define PortableBMUF_Threshold_1         0x8 /*Battery low  - warn user */
 #define PortableBMUF_Threshold_2         0x4 /*Battery flat - shutdown now */
 #define PortableBMUF_LidOpen             0x2
-#define PortableBMUF_Threshold_3         0x1 /*New for Stork  ;Battery charged */
+#define PortableBMUF_Threshold_3         0x1 /*Battery on 'maintenance charge'*/
 
 
 /* BMU commands */
@@ -86,15 +86,15 @@
 /* */
 /* Stork variables */
 /* */
-#define PortableBMUVar_ChargeCurrent     0xc /*12 */
-#define PortableBMUVar_DischargeCurrent  0xd /*13 */
-#define PortableBMUVar_Voltage           0xe /*14 */
-#define PortableBMUVar_Temperature1      0xf /*15 */
-#define PortableBMUVar_Temperature2      0x10 /*16 */
-#define PortableBMUVar_ChargeLevel       0x11 /*17 */
-#define PortableBMUVar_StatusFlags       0x12 /*18 */
-#define PortableBMUVar_InputSignals      0x13 /*19 */
-#define PortableBMUVar_BatteryCapacity   0x14 /*20 */
+#define PortableBMUV_ChargeCurrent     0xc /*12 */
+#define PortableBMUV_DischargeCurrent  0xd /*13 */
+#define PortableBMUV_Voltage2          0xe /*14 */
+#define PortableBMUV_Temperature1      0xf /*15 */
+#define PortableBMUV_Temperature2      0x10 /*16 */
+#define PortableBMUV_ChargeLevel       0x11 /*17 */
+#define PortableBMUV_StatusFlags       0x12 /*18 */
+#define PortableBMUV_InputSignals      0x13 /*19 */
+#define PortableBMUV_BatteryCapacity   0x14 /*20 */
 /* */
 #define PortableBMU_Num_Variables        0x15
 
@@ -110,6 +110,15 @@
 #define PortableStatus_PrinterFloppy     0x2
 #define PortableStatus_TrackerBallConnected 0x4
 #define PortableStatus_LCDOn             0x8
+
+/* Unfreeze service reasons */
+#define PortableUnfreeze_Success	 0x0
+#define PortableUnfreeze_FailedIDE	 0x1
+#define PortableUnfreeze_FailedSound	 0x2
+#define PortableUnfreeze_FailedDisplay	 0x3
+#define PortableUnfreeze_FailedEconet	 0x4
+#define PortableUnfreeze_FailedMisc	 0x5
+#define PortableUnfreeze_FailedSuspend	 0x6
 
 
 #endif

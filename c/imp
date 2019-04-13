@@ -12,6 +12,15 @@
 #include "portable.h"
 #include "PortableVars.h"
 
+/* Define this to debug this file */
+#define DEBUG
+
+#ifdef DEBUG
+#define dprintf if (1) _swix(0x104,0), printf
+#else
+#define dprintf if (0) _swix(0x104,0), printf
+#endif
+
 /*************************************************** Gerph *********
  Function:     imp_checkhardware
  Description:  Check whether the module is valid for this hardware
@@ -180,7 +189,69 @@ varop_t imp_readbmuvar(int var, int *valp)
      or reject variables through this. Probably a table-based implementation
      could also be used if a direct mapping from variables to BMU requests
      can be made. */
-  /* This dummy implementation understands nothing */
+  dprintf("imp_readbmuvar: %i\n",var);
+  switch (var)
+  {
+    case PortableBMUV_VersionNumber:
+      *valp = 0;
+      return varop_ok;
+
+    case PortableBMUV_NominalCapacity:
+      *valp = 100;
+      return varop_ok;
+
+    case PortableBMUV_MeasuredCapacity:
+      *valp = 100;
+      return varop_ok;
+
+    case PortableBMUV_UsedCapacity:
+      *valp = 0;
+      return varop_ok;
+
+    case PortableBMUV_UsableCapacity:
+      *valp = 80; /* Claim it's a little lower than the nominal capacity */
+      return varop_ok;
+
+    case PortableBMUV_ChargeEstimate:
+      *valp = 20;
+      return varop_ok;
+
+    case PortableBMUV_Voltage:
+      *valp = 125; /* 12.5 volts ? */
+      return varop_ok;
+
+    case PortableBMUV_Current:
+      *valp = 1; /* dunno what units */
+      return varop_ok;
+
+    case PortableBMUV_Temperature:
+      *valp = 350; /* 35.0 °c ? */
+      return varop_ok;
+
+    case PortableBMUV_ChargeCurrent:
+      *valp = 20; /* Don't know charge current ? */
+      return varop_ok;
+
+    case PortableBMUV_ChargeLevel: /* Amount available for us to use */
+      *valp = 100;
+      return varop_ok;
+
+    case PortableBMUV_BatteryCapacity: /* Total battery capacity or estimate  */
+      *valp = 40;
+      return varop_ok;
+
+    case PortableBMUV_DischargeCurrent:
+      *valp = 0; /* Not currently dischargine ? */
+      return varop_ok;
+
+    case PortableBMUV_Flags:
+      *valp = PortableBMUF_LidOpen |
+              PortableBMUF_ChargerPresent |
+              PortableBMUF_ChargeKnown |
+              PortableBMUF_BatteryPresent |
+              PortableBMUF_Threshold_3;
+      return varop_ok;
+  }
   return varop_invalid;
 }
 
@@ -205,7 +276,20 @@ varop_t imp_writebmuvar(int var, int val)
      or reject variables through this. Probably a table-based implementation
      could also be used if a direct mapping from variables to BMU requests
      can be made. */
-  /* This dummy implementation understands nothing */
+  switch (var)
+  {
+    case PortableBMUV_VersionNumber:
+    case PortableBMUV_NominalCapacity:
+    case PortableBMUV_MeasuredCapacity:
+    case PortableBMUV_UsedCapacity:
+    case PortableBMUV_UsableCapacity:
+    case PortableBMUV_ChargeEstimate:
+    case PortableBMUV_Voltage:
+    case PortableBMUV_Current:
+    case PortableBMUV_Temperature:
+    case PortableBMUV_Flags:
+      return varop_nowrite;
+  }
   return varop_invalid;
 }
 
