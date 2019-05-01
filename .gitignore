@@ -2,3 +2,7 @@ aof/
 rm/
 oz/
 oz32/
+/artifacts/
+/ci-logs/
+/riscos-build/
+rm32/
