@@ -11,8 +11,8 @@
 #include "Portable.h"
 #include "PortableVars.h"
 #include "imp.h"
-#include "riscos/services.h"
-#include "riscos/events.h"
+#include "riscos/Services.h"
+#include "riscos/Events.h"
 
 /* Define this to debug this file */
 #define DEBUG

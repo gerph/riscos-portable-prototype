@@ -23,21 +23,26 @@ variables:
   dependencies: []
 
 
-
 #### Exports ####
-export-riscos:
+export-headers-riscos:
   <<: *common
   stage: export
   script:
     - ci/build.sh headers
 
+export-libs-riscos:
+  <<: *common
+  stage: export
+  script:
+    - ci/build.sh libs
+
 
 #### Builds ####
-build-riscos:
+build-modules-riscos:
   <<: *common
   stage: build
   script:
-    - ci/build.sh headers ram
+    - ci/build.sh libs ram
 
 
 #### Stages to execute ####

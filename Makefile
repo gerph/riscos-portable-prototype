@@ -30,5 +30,3 @@ cleantarget:
 
 #---------------------------------------------------------------------------
 # Dynamic dependencies:
-oz.portable: c.portable h.modhead C:h.kernel C:h.swis h.Portable h.PortableVars h.imp h.Portable h.PortableVars C:h.kernel C:riscos.h.services C:riscos.h.events
-oz.imp: c.imp C:h.swis C:h.kernel h.modhead C:h.kernel h.portable h.PortableVars

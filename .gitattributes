@@ -1,0 +1,8 @@
+c/* gitlab-language=c
+**/c/* gitlab-language=c
+h/* gitlab-language=c
+**/h/* gitlab-language=c
+hdr/* gitlab-language=armasm
+**/hdr/* gitlab-language=armasm
+cmhg/* gitlab-language=c
+**/cmhg/* gitlab-language=c

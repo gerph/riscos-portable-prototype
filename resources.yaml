@@ -2,27 +2,39 @@
 
 resources:
   build/native-build-tools:
-    phases: headers,ram,rom
+    phases: headers,libs,ram,rom
     version: latest
     path: $ROTOOL_DIR
 
   build/root-env:
-    phases: headers,ram,rom
+    phases: headers,libs,ram,rom
     version: latest
     path: $ROBUILD_DIR/Env
 
   build/build-headers:
-    phases: headers,ram,rom
+    phases: headers,libs
     version: latest
     path: $EXPORTS_DIR
+
+  build/build-libs:
+    phases: ram,rom
+    version: latest
+    path: $EXPORTS_DIR
+
 
 exports:
   modules/ram/portable:
     phases: ram
     newer: true
-    path: $INSTALL_DIR/Modules
+    path: $INSTALL_DIR/RAM
 
   headers/portable:
     phases: headers
     newer: true
     path: $EXPORTS_DIR
+
+  libs/portable:
+    phases: libs
+    newer: true
+    path: $EXPORTS_DIR
+
