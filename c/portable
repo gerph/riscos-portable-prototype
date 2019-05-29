@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include "modhead.h"
 #include "swis.h"
-#include "Portable.h"
+#include "portable.h"
 #include "PortableVars.h"
 #include "imp.h"
 #include "riscos/Services.h"
