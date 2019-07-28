@@ -12,7 +12,7 @@ LIBS       =
 INCLUDES   = 
 CDEFINES   = 
 OBJS       = \
-             o.imp \
+             o.impl \
              o.portable \
              o.modhead
 

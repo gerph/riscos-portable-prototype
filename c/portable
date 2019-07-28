@@ -10,7 +10,7 @@
 #include "swis.h"
 #include "portable.h"
 #include "PortableVars.h"
-#include "imp.h"
+#include "impl.h"
 #include "riscos/Services.h"
 #include "riscos/Events.h"
 
