@@ -31,12 +31,12 @@
  ******************************************************************/
 int imp_checkhardware(void)
 {
-  /* Usually you would probe your power management functions to see
-     if the right sort of hardware was present. If not then we cannot
-     start. */
+    /* Usually you would probe your power management functions to see
+       if the right sort of hardware was present. If not then we cannot
+       start. */
 
-  /* Dummy implementation claims it can always function */
-  return 1;
+    /* Dummy implementation claims it can always function */
+    return 1;
 }
 
 /*************************************************** Gerph *********
@@ -47,34 +47,33 @@ int imp_checkhardware(void)
  ******************************************************************/
 unsigned long imp_initialcontrol(void)
 {
-  /* You should only return the devices that you know are actually
-     available and powered. This may mean calling other components
-     if power control is distributed through a number of devices
-   */
+    /* You should only return the devices that you know are actually
+       available and powered. This may mean calling other components
+       if power control is distributed through a number of devices
+     */
 
-  /* Dummy implementation claims that RiscPC like hardware is powered */
-  int econet_present = _swix(OS_Module,_INR(0,1),18,"Econet")==NULL;
-  return
-    (econet_present ? PortableControl_EconetEnable : 0x0) |
-    /* PortableControl_LCDEnable |       /-* No LCD -*/
-    PortableControl_VideoEnable |     /* Video enabled */
-    PortableControl_SerialEnable |    /* Serial enabled */
-    /* PortableControl_DualEnable |      /-* No dual panel -*/
-    PortableControl_ExtClock | /* Pretend it's an external clock */
-    /* PortableControl_InvertClock |     /-* Clock isn't inverted -*/
-    /* PortableControl_BacklightEnable | /-* No backlight -*/
-    PortableControl_ExtraLines1 |     /* Pretend there's 1 extra line */
-    PortableControl_DRAMs1 |          /* No dual panel really, so just 1 DRAM */
-    PortableControl_SoundEnable |     /* Sound is enabled */
-    /* PortableControl_PCMCIAEnable |    /-* No PCMCIA -*/
-    PortableControl_ParallelEnable |  /* Parallel enabled */
-    PortableControl_FDCEnable |       /* We have floppies */
-    PortableControl_IDEEnable |       /* We have IDE */
-    /* PortableControl_LCDInvert |       /-* No LCD inversion -*/
-    /* PortableControl_IntTBallEnable |  /-* No tracker ball -*/
-    PortableControl_ExtMouseEnable |  /* External mouse present */
-    PortableControl_ExtPowerEnable |  /* Keyboard and mouse are powered */
-    0x0;
+    /* Dummy implementation claims that RiscPC like hardware is powered */
+    int econet_present = _swix(OS_Module, _INR(0, 1), 18, "Econet") == NULL;
+    return (econet_present ? PortableControl_EconetEnable : 0x0) |
+           /* PortableControl_LCDEnable |       /-* No LCD - */
+           PortableControl_VideoEnable |   /* Video enabled */
+           PortableControl_SerialEnable |  /* Serial enabled */
+           /* PortableControl_DualEnable |      /-* No dual panel - */
+           PortableControl_ExtClock |      /* Pretend it's an external clock */
+           /* PortableControl_InvertClock |     /-* Clock isn't inverted - */
+           /* PortableControl_BacklightEnable | /-* No backlight - */
+           PortableControl_ExtraLines1 |   /* Pretend there's 1 extra line */
+           PortableControl_DRAMs1 |        /* No dual panel really, so just 1 DRAM */
+           PortableControl_SoundEnable |   /* Sound is enabled */
+           /* PortableControl_PCMCIAEnable |    /-* No PCMCIA - */
+           PortableControl_ParallelEnable |        /* Parallel enabled */
+           PortableControl_FDCEnable |     /* We have floppies */
+           PortableControl_IDEEnable |     /* We have IDE */
+           /* PortableControl_LCDInvert |       /-* No LCD inversion - */
+           /* PortableControl_IntTBallEnable |  /-* No tracker ball - */
+           PortableControl_ExtMouseEnable |        /* External mouse present */
+           PortableControl_ExtPowerEnable |        /* Keyboard and mouse are powered */
+           0x0;
 }
 
 /*************************************************** Gerph *********
@@ -85,12 +84,12 @@ unsigned long imp_initialcontrol(void)
  ******************************************************************/
 void imp_initmonitor(void)
 {
-  /* Usually we'd claim a device vector to trap interrupts from the BMU
-     or use a CallEvery to poll the device every second or so. When the
-     monitoring routine detects a change it will call state_changed to
-     notify RISC OS clients of the new state. */
-  /* Dummy implementation does nothing */
-  return;
+    /* Usually we'd claim a device vector to trap interrupts from the BMU
+       or use a CallEvery to poll the device every second or so. When the
+       monitoring routine detects a change it will call state_changed to
+       notify RISC OS clients of the new state. */
+    /* Dummy implementation does nothing */
+    return;
 }
 
 /*************************************************** Gerph *********
@@ -101,9 +100,9 @@ void imp_initmonitor(void)
  ******************************************************************/
 void imp_finalmonitor(void)
 {
-  /* Release the vectors we claimed in imp_initmonitor */
-  /* Dummy implementation does nothing */
-  return;
+    /* Release the vectors we claimed in imp_initmonitor */
+    /* Dummy implementation does nothing */
+    return;
 }
 
 /*************************************************** Gerph *********
@@ -117,11 +116,11 @@ void imp_finalmonitor(void)
  ******************************************************************/
 int imp_speed(int oldspeed, int speed)
 {
-  /* Usually we'd apply the speed change here and only fault it if
-     there was some reason that the processor speed couldn't be
-     reduced */
-  /* We can't change the speed, so we just say that it's fast */
-  return PortableSpeed_Fast;
+    /* Usually we'd apply the speed change here and only fault it if
+       there was some reason that the processor speed couldn't be
+       reduced */
+    /* We can't change the speed, so we just say that it's fast */
+    return PortableSpeed_Fast;
 }
 
 /*************************************************** Gerph *********
@@ -135,19 +134,19 @@ int imp_speed(int oldspeed, int speed)
  ******************************************************************/
 unsigned long imp_controlcheck(unsigned long current, unsigned long change, int on)
 {
-  /* We need to check that the flags that have been requested to be changed
-     can actually be changed. If, for example, we can't change the power to
-     the Video output then we would always clear that bit, regardless of
-     whether the 'on' or 'off' state was set. If, on the other hand, we
-     can only change the power to the Video output if there is external
-     power connected, then we would have to validate this before we accepted
-     the change.
-     You should never be asked to power a device which is already powered
-     or remove power from a device which is not powered.
-   */
-  /* This implementation allows NO changes to anything, so we clear all the
-     change bits and return 0 */
-  return 0;
+    /* We need to check that the flags that have been requested to be changed
+       can actually be changed. If, for example, we can't change the power to
+       the Video output then we would always clear that bit, regardless of
+       whether the 'on' or 'off' state was set. If, on the other hand, we
+       can only change the power to the Video output if there is external
+       power connected, then we would have to validate this before we accepted
+       the change.
+       You should never be asked to power a device which is already powered
+       or remove power from a device which is not powered.
+     */
+    /* This implementation allows NO changes to anything, so we clear all the
+       change bits and return 0 */
+    return 0;
 }
 
 /*************************************************** Gerph *********
@@ -161,12 +160,12 @@ unsigned long imp_controlcheck(unsigned long current, unsigned long change, int 
  ******************************************************************/
 void imp_control(unsigned long current, unsigned long change, int on)
 {
-  /* We assume that imp_controlcheck/imp_controlcheck have validated
-     the flags that we're about to change. We affect the change and
-     return.
-   */
-  /* This implementation doesn't do anything, so we just return now */
-  return;
+    /* We assume that imp_controlcheck/imp_controlcheck have validated
+       the flags that we're about to change. We affect the change and
+       return.
+     */
+    /* This implementation doesn't do anything, so we just return now */
+    return;
 }
 
 /*************************************************** Gerph *********
@@ -186,74 +185,74 @@ void imp_control(unsigned long current, unsigned long change, int on)
  ******************************************************************/
 varop_t imp_readbmuvar(int var, int *valp)
 {
-  /* Usually you would have a switch statement here and you would accept
-     or reject variables through this. Probably a table-based implementation
-     could also be used if a direct mapping from variables to BMU requests
-     can be made. */
-  dprintf("imp_readbmuvar: %i\n",var);
-  switch (var)
-  {
-    case PortableBMUV_VersionNumber:
-      *valp = 0;
-      return varop_ok;
+    /* Usually you would have a switch statement here and you would accept
+       or reject variables through this. Probably a table-based implementation
+       could also be used if a direct mapping from variables to BMU requests
+       can be made. */
+    dprintf("imp_readbmuvar: %i\n", var);
+    switch (var)
+    {
+        case PortableBMUV_VersionNumber:
+            *valp = 0;
+            return varop_ok;
 
-    case PortableBMUV_NominalCapacity:
-      *valp = 100;
-      return varop_ok;
+        case PortableBMUV_NominalCapacity:
+            *valp = 100;
+            return varop_ok;
 
-    case PortableBMUV_MeasuredCapacity:
-      *valp = 100;
-      return varop_ok;
+        case PortableBMUV_MeasuredCapacity:
+            *valp = 100;
+            return varop_ok;
 
-    case PortableBMUV_UsedCapacity:
-      *valp = 0;
-      return varop_ok;
+        case PortableBMUV_UsedCapacity:
+            *valp = 0;
+            return varop_ok;
 
-    case PortableBMUV_UsableCapacity:
-      *valp = 80; /* Claim it's a little lower than the nominal capacity */
-      return varop_ok;
+        case PortableBMUV_UsableCapacity:
+            *valp = 80;         /* Claim it's a little lower than the nominal capacity */
+            return varop_ok;
 
-    case PortableBMUV_ChargeEstimate:
-      *valp = 20;
-      return varop_ok;
+        case PortableBMUV_ChargeEstimate:
+            *valp = 20;
+            return varop_ok;
 
-    case PortableBMUV_Voltage:
-      *valp = 125; /* 12.5 volts ? */
-      return varop_ok;
+        case PortableBMUV_Voltage:
+            *valp = 125;        /* 12.5 volts ? */
+            return varop_ok;
 
-    case PortableBMUV_Current:
-      *valp = 1; /* dunno what units */
-      return varop_ok;
+        case PortableBMUV_Current:
+            *valp = 1;          /* dunno what units */
+            return varop_ok;
 
-    case PortableBMUV_Temperature:
-      *valp = 350; /* 35.0 °c ? */
-      return varop_ok;
+        case PortableBMUV_Temperature:
+            *valp = 350;        /* 35.0 °c ? */
+            return varop_ok;
 
-    case PortableBMUV_ChargeCurrent:
-      *valp = 20; /* Don't know charge current ? */
-      return varop_ok;
+        case PortableBMUV_ChargeCurrent:
+            *valp = 20;         /* Don't know charge current ? */
+            return varop_ok;
 
-    case PortableBMUV_ChargeLevel: /* Amount available for us to use */
-      *valp = 100;
-      return varop_ok;
+        case PortableBMUV_ChargeLevel: /* Amount available for us to use */
+            *valp = 100;
+            return varop_ok;
 
-    case PortableBMUV_BatteryCapacity: /* Total battery capacity or estimate  */
-      *valp = 40;
-      return varop_ok;
+        case PortableBMUV_BatteryCapacity:     /* Total battery capacity or estimate  */
+            *valp = 40;
+            return varop_ok;
 
-    case PortableBMUV_DischargeCurrent:
-      *valp = 0; /* Not currently dischargine ? */
-      return varop_ok;
+        case PortableBMUV_DischargeCurrent:
+            *valp = 0;          /* Not currently dischargine ? */
+            return varop_ok;
 
-    case PortableBMUV_Flags:
-      *valp = PortableBMUF_LidOpen |
-              PortableBMUF_ChargerPresent |
-              PortableBMUF_ChargeKnown |
-              PortableBMUF_BatteryPresent |
-              PortableBMUF_Threshold_3;
-      return varop_ok;
-  }
-  return varop_invalid;
+        case PortableBMUV_Flags:
+            *valp = PortableBMUF_LidOpen |
+                    PortableBMUF_ChargerPresent |
+                    PortableBMUF_ChargeKnown |
+                    PortableBMUF_BatteryPresent |
+                    PortableBMUF_Threshold_3;
+            return varop_ok;
+    }
+    return varop_invalid;
 }
 
 /*************************************************** Gerph *********
@@ -273,25 +272,25 @@ varop_t imp_readbmuvar(int var, int *valp)
  ******************************************************************/
 varop_t imp_writebmuvar(int var, int val)
 {
-  /* Usually you would have a switch statement here and you would accept
-     or reject variables through this. Probably a table-based implementation
-     could also be used if a direct mapping from variables to BMU requests
-     can be made. */
-  switch (var)
-  {
-    case PortableBMUV_VersionNumber:
-    case PortableBMUV_NominalCapacity:
-    case PortableBMUV_MeasuredCapacity:
-    case PortableBMUV_UsedCapacity:
-    case PortableBMUV_UsableCapacity:
-    case PortableBMUV_ChargeEstimate:
-    case PortableBMUV_Voltage:
-    case PortableBMUV_Current:
-    case PortableBMUV_Temperature:
-    case PortableBMUV_Flags:
-      return varop_nowrite;
-  }
-  return varop_invalid;
+    /* Usually you would have a switch statement here and you would accept
+       or reject variables through this. Probably a table-based implementation
+       could also be used if a direct mapping from variables to BMU requests
+       can be made. */
+    switch (var)
+    {
+        case PortableBMUV_VersionNumber:
+        case PortableBMUV_NominalCapacity:
+        case PortableBMUV_MeasuredCapacity:
+        case PortableBMUV_UsedCapacity:
+        case PortableBMUV_UsableCapacity:
+        case PortableBMUV_ChargeEstimate:
+        case PortableBMUV_Voltage:
+        case PortableBMUV_Current:
+        case PortableBMUV_Temperature:
+        case PortableBMUV_Flags:
+            return varop_nowrite;
+    }
+    return varop_invalid;
 }
 
 /*************************************************** Gerph *********
@@ -301,13 +300,13 @@ varop_t imp_writebmuvar(int var, int val)
                r-> the registers passed on entry
  Returns:      1 if successful, 0 if an invalid command
  ******************************************************************/
-int imp_commandbmu(int cmd, _kernel_swi_regs *r)
+int imp_commandbmu(int cmd, _kernel_swi_regs * r)
 {
-  /* The command most likely to be used here would be the command to remove
-     power. We would reject those commands which we are incapable of
-     servicing. */
-  /* Dummy implementation does nothing */
-  return 0;
+    /* The command most likely to be used here would be the command to remove
+       power. We would reject those commands which we are incapable of
+       servicing. */
+    /* Dummy implementation does nothing */
+    return 0;
 }
 
 /*************************************************** Gerph *********
@@ -318,20 +317,19 @@ int imp_commandbmu(int cmd, _kernel_swi_regs *r)
  ******************************************************************/
 unsigned long imp_readfeatures(void)
 {
-  /* Here we return what sort of operations we can perform. Although the
-     SWIs are present for some of these calls we may not necessarily
-     support them on some hardware. In particular, it may not be possible
-     on some machines to reduce the clock speed to 'idle' the machine,
-     or to freeze the machine's state. This is where you return these
-     details.
-   */
-  /* Dummy implementation says that we can be called for 'Idle' and 'Speed'
-     only - even though we don't actually do anything - as an example */
-  return
-    PortableFeature_Speed | /* We can slow the processor */
-    PortableFeature_Idle |  /* We can hlt the processor */
-    /* PortableFeature_Stop |  /-* We cannot stop the processor -*/
-    0;
+    /* Here we return what sort of operations we can perform. Although the
+       SWIs are present for some of these calls we may not necessarily
+       support them on some hardware. In particular, it may not be possible
+       on some machines to reduce the clock speed to 'idle' the machine,
+       or to freeze the machine's state. This is where you return these
+       details.
+     */
+    /* Dummy implementation says that we can be called for 'Idle' and 'Speed'
+       only - even though we don't actually do anything - as an example */
+    return PortableFeature_Speed |      /* We can slow the processor */
+           PortableFeature_Idle |  /* We can hlt the processor */
+           /* PortableFeature_Stop |  /-* We cannot stop the processor - */
+           0;
 }
 
 /*************************************************** Gerph *********
@@ -343,10 +341,10 @@ unsigned long imp_readfeatures(void)
  ******************************************************************/
 void imp_idle(void)
 {
-  /* Normally we'd halt the CPU here until some interrupt happened that we
-     had to service. */
-  /* Dummy implementation just returns */
-  return;
+    /* Normally we'd halt the CPU here until some interrupt happened that we
+       had to service. */
+    /* Dummy implementation just returns */
+    return;
 }
 
 /*************************************************** Gerph *********
@@ -357,12 +355,12 @@ void imp_idle(void)
  ******************************************************************/
 int imp_stop(void)
 {
-  /* We set the RAM to auto-refresh, disable hardware devices and generally
-     put the machine into a 'standby' state.
-   */
-  /* Dummy implementation returns a 'no reason' response to indicate that
-     the system returned but the reason was indeterminate */
-  return PortableWake_NoReason;
+    /* We set the RAM to auto-refresh, disable hardware devices and generally
+       put the machine into a 'standby' state.
+     */
+    /* Dummy implementation returns a 'no reason' response to indicate that
+       the system returned but the reason was indeterminate */
+    return PortableWake_NoReason;
 }
 
 /*************************************************** Gerph *********
@@ -373,13 +371,12 @@ int imp_stop(void)
  ******************************************************************/
 unsigned long imp_status(void)
 {
-  /* We would return the state of equipment connected to the portable
-     device here. */
-  /* Dummy implementation just claimes we've got a floppy. */
-  return
-     /* ProtableStatus_DocStationConnected |  /-* No doc station -*/
-     PortableStatus_PrinterFloppy |
-     /* ProtableStatus_TrackerBallConnected | /-* No tracker ball -*/
-     /* ProtableStatus_LCDOn |                /-* No LCD - external video -*/
-     0;
+    /* We would return the state of equipment connected to the portable
+       device here. */
+    /* Dummy implementation just claimes we've got a floppy. */
+    return /* PortableStatus_DocStationConnected |  /-* No doc station - */
+           PortableStatus_PrinterFloppy |
+           /* ProtableStatus_TrackerBallConnected | /-* No tracker ball - */
+           /* ProtableStatus_LCDOn |                /-* No LCD - external video - */
+           0;
 }

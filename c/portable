@@ -27,6 +27,7 @@ unsigned long speed = PortableSpeed_Fast;
 unsigned long control = 0;
 static int monitorenabled = 0;
 
+
 /***************************************************************************
  * Function:     Mod_Init
  * Description:  Initialise the module, setting up vectors, callbacks and
@@ -41,12 +42,12 @@ static int monitorenabled = 0;
  **************************************************************************/
 _kernel_oserror *Mod_Init(const char *tail, int podule_base, void *pw)
 {
-  int functional = imp_checkhardware();
-  if (!functional)
-    return err_BadHardware;
-  monitorenabled = 0;
-  control = imp_initialcontrol();
-  return NULL;
+    int functional = imp_checkhardware();
+    if (!functional)
+        return err_BadHardware;
+    monitorenabled = 0;
+    control = imp_initialcontrol();
+    return NULL;
 }
 
 /***************************************************************************
@@ -63,12 +64,12 @@ _kernel_oserror *Mod_Init(const char *tail, int podule_base, void *pw)
  **************************************************************************/
 _kernel_oserror *Mod_Final(int fatal, int podule_base, void *pw)
 {
-  if (monitorenabled)
-  {
-    imp_finalmonitor();
-    monitorenabled=0;
-  }
-  return NULL;
+    if (monitorenabled)
+    {
+        imp_finalmonitor();
+        monitorenabled = 0;
+    }
+    return NULL;
 }
 
 /*************************************************** Gerph *********
@@ -80,7 +81,7 @@ _kernel_oserror *Mod_Final(int fatal, int podule_base, void *pw)
  ******************************************************************/
 void state_changed(unsigned long flags)
 {
-  _swix(OS_GenerateEvent,_INR(0,1),Event_PortableBMU,flags);
+    _swix(OS_GenerateEvent, _INR(0, 1), Event_PortableBMU, flags);
 }
 
 /*
@@ -92,20 +93,20 @@ void state_changed(unsigned long flags)
              0 = fast
              1 = slow
  */
-_kernel_oserror *SWI_Speed(int number, _kernel_swi_regs *r, void *pw)
+_kernel_oserror *SWI_Speed(int number, _kernel_swi_regs * r, void *pw)
 {
-  unsigned long eor = (unsigned long)r->r[0];
-  unsigned long and = (unsigned long)r->r[1];
-  unsigned long oldspeed = speed;
-  speed = (speed & and) ^ eor;
-  if (speed ^ oldspeed)
-  {
-    /* The speed changed, so we need to effect the change */
-    speed = imp_speed(oldspeed, speed);
-  }
-  r->r[0] = oldspeed;
-  r->r[1] = speed;
-  return NULL;
+    unsigned long eor = (unsigned long) r->r[0];
+    unsigned long and = (unsigned long) r->r[1];
+    unsigned long oldspeed = speed;
+    speed = (speed & and) ^ eor;
+    if (speed ^ oldspeed)
+    {
+        /* The speed changed, so we need to effect the change */
+        speed = imp_speed(oldspeed, speed);
+    }
+    r->r[0] = oldspeed;
+    r->r[1] = speed;
+    return NULL;
 }
 
 /*
@@ -115,37 +116,38 @@ _kernel_oserror *SWI_Speed(int number, _kernel_swi_regs *r, void *pw)
    <= R0 = old value
       R1 = new value
  */
-_kernel_oserror *SWI_Control(int number, _kernel_swi_regs *r, void *pw)
+_kernel_oserror *SWI_Control(int number, _kernel_swi_regs * r, void *pw)
 {
-  unsigned long eor = (unsigned long)r->r[0];
-  unsigned long and = (unsigned long)r->r[1];
-  unsigned long oldcontrol = control;
-  unsigned long newcontrol = ((control & and) ^ eor);
-  unsigned long changed;
-  changed = newcontrol ^ oldcontrol;
-  if (changed)
-  {
-    /* The control changed, so we need to effect the change */
-    unsigned long powerup   = newcontrol & changed;
-    unsigned long powerdown = powerup ^ changed;
+    unsigned long eor = (unsigned long) r->r[0];
+    unsigned long and = (unsigned long) r->r[1];
+    unsigned long oldcontrol = control;
+    unsigned long newcontrol = ((control & and) ^ eor);
+    unsigned long changed;
+    changed = newcontrol ^ oldcontrol;
+    if (changed)
+    {
+        /* The control changed, so we need to effect the change */
+        unsigned long powerup = newcontrol & changed;
+        unsigned long powerdown = powerup ^ changed;
 
-    powerdown = imp_controlcheck(control, powerdown, 0);
+        powerdown = imp_controlcheck(control, powerdown, 0);
 
-    _swix(OS_ServiceCall,_INR(1,3)|_OUT(3), Service_Portable, ServicePortable_PowerDown, powerdown, &powerdown);
+        _swix(OS_ServiceCall, _INR(1, 3) | _OUT(3), Service_Portable, ServicePortable_PowerDown,
+              powerdown, &powerdown);
 
-    imp_control(control, powerdown, 0);
-    control &= ~powerdown;
+        imp_control(control, powerdown, 0);
+        control &= ~powerdown;
 
-    powerup = imp_controlcheck(control, powerup, 1);
+        powerup = imp_controlcheck(control, powerup, 1);
 
-    imp_control(control, powerup, 1);
-    control |= powerup;
+        imp_control(control, powerup, 1);
+        control |= powerup;
 
-    _swix(OS_ServiceCall,_INR(1,3), Service_Portable, ServicePortable_PowerUp, powerup);
-  }
-  r->r[0] = oldcontrol;
-  r->r[1] = control;
-  return NULL;
+        _swix(OS_ServiceCall, _INR(1, 3), Service_Portable, ServicePortable_PowerUp, powerup);
+    }
+    r->r[0] = oldcontrol;
+    r->r[1] = control;
+    return NULL;
 }
 
 /*
@@ -154,25 +156,31 @@ _kernel_oserror *SWI_Control(int number, _kernel_swi_regs *r, void *pw)
      R1 = value (for write)
   <= R1 = value (for read)
  */
-_kernel_oserror *SWI_BMUVariable(int number, _kernel_swi_regs *r,
-                                      void *pw)
+_kernel_oserror *SWI_BMUVariable(int number, _kernel_swi_regs * r, void *pw)
 {
-  int var = r->r[0];
-  varop_t res;
-  if (number == Portable_ReadBMUVariable - Portable_00)
-    res = imp_readbmuvar(var, &r->r[1]);
-  else
-    res = imp_writebmuvar(var, r->r[1]);
-  switch (res)
-  {
-    case varop_ok:       return NULL;
-    case varop_noread:   return err_BMUCannotReadVariable;
-    case varop_nowrite:  return err_BMUCannotWriteVariable;
-    case varop_badvalue: return err_BMUValueNotValid;
-    case varop_failed:   return err_BMUChangeFailed;
-    default:
-    case varop_invalid:  return err_BadBMUVariable;
-  }
+    int var = r->r[0];
+    varop_t res;
+    if (number == Portable_ReadBMUVariable - Portable_00)
+        res = imp_readbmuvar(var, &r->r[1]);
+    else
+        res = imp_writebmuvar(var, r->r[1]);
+
+    switch (res)
+    {
+        case varop_ok:
+            return NULL;
+        case varop_noread:
+            return err_BMUCannotReadVariable;
+        case varop_nowrite:
+            return err_BMUCannotWriteVariable;
+        case varop_badvalue:
+            return err_BMUValueNotValid;
+        case varop_failed:
+            return err_BMUChangeFailed;
+        default:
+        case varop_invalid:
+            return err_BadBMUVariable;
+    }
 }
 
 /*
@@ -180,109 +188,111 @@ _kernel_oserror *SWI_BMUVariable(int number, _kernel_swi_regs *r,
    => R0 = reason code
       R1-R5 dependant on parameters
  */
-_kernel_oserror *SWI_CommandBMU(int number, _kernel_swi_regs *r, void *pw)
+_kernel_oserror *SWI_CommandBMU(int number, _kernel_swi_regs * r, void *pw)
 {
-  int ok;
+    int ok;
 
-  /* First deal with the calls we can handle internally without the
-     implementation being called */
-  switch (r->r[0])
-  {
-    case PortableBMUC_DisablePMInts:
-      if (monitorenabled)
-      {
-        imp_finalmonitor();
-        monitorenabled=0;
-      }
-      ok=1;
-      break;
+    /* First deal with the calls we can handle internally without the
+       implementation being called */
+    switch (r->r[0])
+    {
+        case PortableBMUC_DisablePMInts:
+            if (monitorenabled)
+            {
+                imp_finalmonitor();
+                monitorenabled = 0;
+            }
+            ok = 1;
+            break;
 
-    case PortableBMUC_EnablePMInts:
-      if (!monitorenabled)
-      {
-        imp_initmonitor();
-        monitorenabled=1;
-      }
-      ok=1;
-      break;
+        case PortableBMUC_EnablePMInts:
+            if (!monitorenabled)
+            {
+                imp_initmonitor();
+                monitorenabled = 1;
+            }
+            ok = 1;
+            break;
 
-    /* And if we can't handle it, pass on to the implementation */
-    default:
-      ok = imp_commandbmu(r->r[0], r);
-      break;
-  }
-  if (!ok)
-    return err_BadBMUCommand;
-  return NULL;
+            /* And if we can't handle it, pass on to the implementation */
+        default:
+            ok = imp_commandbmu(r->r[0], r);
+            break;
+    }
+
+    if (!ok)
+        return err_BadBMUCommand;
+    return NULL;
 }
 
 /*
  Portable_ReadFeatures
    <= R1 = Features we provide
  */
-_kernel_oserror *SWI_ReadFeatures(int number, _kernel_swi_regs *r, void *pw)
+_kernel_oserror *SWI_ReadFeatures(int number, _kernel_swi_regs * r, void *pw)
 {
-  r->r[1] = imp_readfeatures();
-  return NULL;
+    r->r[1] = imp_readfeatures();
+    return NULL;
 }
 
 /*
  Portable_Idle
  */
-_kernel_oserror *SWI_Idle(int number, _kernel_swi_regs *r, void *pw)
+_kernel_oserror *SWI_Idle(int number, _kernel_swi_regs * r, void *pw)
 {
-  imp_idle();
-  return NULL;
+    imp_idle();
+    return NULL;
 }
 
 /*
  Portable_Stop
    <= R0 = reason for wake up
  */
-_kernel_oserror *SWI_Stop(int number, _kernel_swi_regs *r, void *pw)
+_kernel_oserror *SWI_Stop(int number, _kernel_swi_regs * r, void *pw)
 {
-  int failed;
-  int unclaimed;
-  _kernel_oserror *err;
-  
-  /* First check whether other people want to freeze right now */
-  err = _swix(OS_ServiceCall, _INR(1,2)|_OUT(1), Service_Portable, ServicePortable_FreezeRequest, &unclaimed);
-  if (err)
-    return err;
-  if (unclaimed)
-    return err_CantFreeze;
-  
-  /* Inform all the clients that we're freezing */
-  _swix(OS_ServiceCall, _INR(1,2), Service_Portable, ServicePortable_Freeze);
-    
-  /* Ok, it's been accepted so we want to shut down the RISC OS interfaces */
-  failed = PortableUnfreeze_Success;
-  
-  /* ... stuff */
+    int failed;
+    int unclaimed;
+    _kernel_oserror *err;
 
-  /* Now tell the hardware to stop */
-  if (failed==PortableUnfreeze_Success)
-    r->r[0] = imp_stop();
-    
-  /* Inform all the clients that we're freezing */
-  _swix(OS_ServiceCall, _INR(1,3), Service_Portable, ServicePortable_Unfreeze, failed);
+    /* First check whether other people want to freeze right now */
+    err = _swix(OS_ServiceCall, _INR(1, 2) | _OUT(1),
+                                Service_Portable, ServicePortable_FreezeRequest,
+                                &unclaimed);
+    if (err)
+        return err;
+    if (unclaimed)
+        return err_CantFreeze;
 
-  /* Now restore the RISC OS interface */
-  /* ... */
-  
-  if (failed)
-    return err_FreezeFailed;
+    /* Inform all the clients that we're freezing */
+    _swix(OS_ServiceCall, _INR(1, 2), Service_Portable, ServicePortable_Freeze);
 
-  return NULL;
+    /* Ok, it's been accepted so we want to shut down the RISC OS interfaces */
+    failed = PortableUnfreeze_Success;
+
+    /* ... stuff */
+
+    /* Now tell the hardware to stop */
+    if (failed == PortableUnfreeze_Success)
+        r->r[0] = imp_stop();
+
+    /* Inform all the clients that we're freezing */
+    _swix(OS_ServiceCall, _INR(1, 3), Service_Portable, ServicePortable_Unfreeze, failed);
+
+    /* Now restore the RISC OS interface */
+    /* ... */
+
+    if (failed)
+        return err_FreezeFailed;
+
+    return NULL;
 }
 
 /*
  Portable_Status
    <= R0 = current status of the device
  */
-_kernel_oserror *SWI_Status(int number, _kernel_swi_regs *r, void *pw)
+_kernel_oserror *SWI_Status(int number, _kernel_swi_regs * r, void *pw)
 {
-  r->r[0] = imp_status();
-  return NULL;
+    r->r[0] = imp_status();
+    return NULL;
 }
-
