@@ -43,7 +43,7 @@ build-modules-riscos:
   <<: *common
   stage: build
   script:
-    - ci/build.sh install --upload
+    - ci/build.sh ram --upload
 
 
 build-module-riscos-service:
