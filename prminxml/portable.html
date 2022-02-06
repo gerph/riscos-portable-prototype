@@ -1,0 +1,556 @@
+<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/TR/xhtml1/strict" xmlns:localdb="local-file-database" xmlns:saxon="http://icl.com/saxon" xmlns:pixparams="http://gerph.org/dtd/prminxml-params"><!--
+  Auto-generated using XSLT stylesheet created by Gerph.
+
+  This document was created with the HTML stylesheet updated 19 Sep 2020.
+-->
+
+
+
+<head><meta charset="utf-8"/><title>RISC OS Programmers Reference Manuals : The Portable module</title></head><body bgcolor="white" text="black" link="blue" alink="red" vlink="darkblue"><hr/><h1>The Portable module</h1><hr/><dl><dt><h2>Contents</h2></dt><dd><ul><li><a href="#section_introduction">Introduction</a></li><li><a href="#section_technical_details">Technical details</a><ul><li><a href="#subsection_a4_portable_details">A4 portable details</a><ul><li><a href="#subsubsection_colour_to_greyscale_mapping">Colour to grey-scale mapping</a></li></ul></li></ul></li><li><a href="#section_service_calls">Service calls</a><ul><li><a href="#service_portable">Portable</a></li><li><a href="#service_portable-0">Portable 0 - PowerDown</a></li><li><a href="#service_portable-1">Portable 1 - PowerUp</a></li><li><a href="#service_portable-3">Portable 3 - Freeze</a></li><li><a href="#service_portable-4">Portable 4 - Unfreeze</a></li><li><a href="#service_portable-5">Portable 5 - FreezeRequest</a></li></ul></li><li><a href="#section_swi_calls">SWI Calls</a><ul><li><a href="#swi_portable_speed">SWI Portable_Speed</a></li><li><a href="#swi_portable_control">SWI Portable_Control</a></li><li><a href="#swi_portable_readbmuvariable">SWI Portable_ReadBMUVariable</a></li><li><a href="#swi_portable_writebmuvariable">SWI Portable_WriteBMUVariable</a></li><li><a href="#swi_portable_commandbmu">SWI Portable_CommandBMU</a></li><li><a href="#swi_portable_readfeatures">SWI Portable_ReadFeatures</a></li><li><a href="#swi_portable_idle">SWI Portable_Idle</a></li><li><a href="#swi_portable_stop">SWI Portable_Stop</a></li><li><a href="#swi_portable_status">SWI Portable_Status</a></li></ul></li></ul></dd></dl><hr/><dl><dt><h2><a name="section_introduction">Introduction</a></h2></dt><dd><dl><dd><p>This module provides support for portable machines. The SWIs listed are
+not normally intended to be issued from user programs, they will normally be
+issued by other modules in the system.
+
+<font color="#DD0000"><strong>FIXME:</strong> Missing details of the PortableBMU event</font>
+
+</p></dd></dl></dd></dl><hr/><dl><dt><h2><a name="section_technical_details">Technical details</a></h2></dt><dt><h4><a name="subsection_a4_portable_details">A4 portable details</a></h4></dt><dd><dl><dt><h4><a name="subsubsection_colour_to_greyscale_mapping">Colour to grey-scale mapping</a></h4></dt><dd>
+
+<p>The Portable module has to convert the users RGB palette settings into a
+grey-scale value in the range 0 to 14 (since the LCD panel only supports 15
+unique grey levels). It does this using the following algorithm:</p>
+
+<p>Luminance = (4 × Green) + (2 × Red) + Blue</p>
+
+<p>Red, Green and Blue are in the range 0 to 255, so the luminance is in the
+range 0 to 1785 (255 × 7). It is then mapped down onto the range 0 to
+14 using the following table:</p>
+
+<p>
+<table summary="Opaque table of values" border="0" cellspacing="8"><tr><th align="right" valign="bottom">Luminance</th><th align="left" valign="bottom">Grey level</th><th align="left" valign="bottom">Palette values for R, G and B</th></tr>
+<tr><td valign="top" align="right">0 - 118</td><td valign="top" align="left">0</td><td valign="top" align="left">&amp;00</td></tr>
+<tr><td valign="top" align="right">119 - 237</td><td valign="top" align="left">1</td><td valign="top" align="left">&amp;12</td></tr>
+<tr><td valign="top" align="right">238 - 356</td><td valign="top" align="left">2</td><td valign="top" align="left">&amp;24</td></tr>
+<tr><td valign="top" align="right">357 - 475</td><td valign="top" align="left">3</td><td valign="top" align="left">&amp;37</td></tr>
+<tr><td valign="top" align="right">476 - 594</td><td valign="top" align="left">4</td><td valign="top" align="left">&amp;49</td></tr>
+<tr><td valign="top" align="right">595 - 713</td><td valign="top" align="left">5</td><td valign="top" align="left">&amp;5B</td></tr>
+<tr><td valign="top" align="right">714 - 832</td><td valign="top" align="left">6</td><td valign="top" align="left">&amp;6D</td></tr>
+<tr><td valign="top" align="right">833 - 952</td><td valign="top" align="left">7</td><td valign="top" align="left">&amp;7F</td></tr>
+<tr><td valign="top" align="right">953 - 1071</td><td valign="top" align="left">8</td><td valign="top" align="left">&amp;92</td></tr>
+<tr><td valign="top" align="right">1072 - 1190</td><td valign="top" align="left">9</td><td valign="top" align="left">&amp;A4</td></tr>
+<tr><td valign="top" align="right">1191 - 1309</td><td valign="top" align="left">10</td><td valign="top" align="left">&amp;B6</td></tr>
+<tr><td valign="top" align="right">1310 - 1428</td><td valign="top" align="left">11</td><td valign="top" align="left">&amp;C8</td></tr>
+<tr><td valign="top" align="right">1429 - 1547</td><td valign="top" align="left">12</td><td valign="top" align="left">&amp;DB</td></tr>
+<tr><td valign="top" align="right">1548 - 1666</td><td valign="top" align="left">13</td><td valign="top" align="left">&amp;ED</td></tr>
+<tr><td valign="top" align="right">1667 - 1785</td><td valign="top" align="left">14</td><td valign="top" align="left">&amp;FF</td></tr>
+</table>
+</p>
+
+<p>The mapping table above is provided for information only, and may be
+subject to change in later versions of the Portable module.</p>
+
+<p>In 256 colour modes the colour mapping is partly determined by the
+hardware, since the top 4 bits of the pixel value go directly to particular
+bits of the three guns, and the LCD ASIC only takes input from VIDC's red
+output. Thus the grey level will not in general map correctly from the
+luminance of the RGB value which would normally be output.</p>
+
+</dd></dl></dd></dl><hr/><dl><dt><h2><a name="section_service_calls">Service calls</a></h2></dt><dd><dl><dd><hr/><h2 align="right"><a name="service_portable">Service_Portable</a><br/>
+    (<acronym>Service &amp;8A</acronym>)</h2><dd>Portable state change request, or information</dd><dt><h5>On entry</h5></dt><dd><table summary="Conditions on entry to Service call" border="0">
+<tr><td valign="top" align="right">R1</td><td valign="top">=</td><td valign="top" align="left">Reason code (&amp;8A)</td></tr>
+<tr><td valign="top" align="right">R2</td><td valign="top">=</td><td valign="top" align="left">Sub-reason code :
+ <table summary="Opaque table of values" border="0" cellspacing="8"><tr><th align="right" valign="bottom">Value</th><th align="left" valign="bottom">Meaning</th></tr>
+  <tr><td valign="top" align="right">0</td><td valign="top" align="left">
+   <a href="#service_portable-0">Hardware is about to be powered down</a>
+  </td></tr>
+
+  <tr><td valign="top" align="right">1</td><td valign="top" align="left">
+   <a href="#service_portable-1">Hardware has been powered up</a>
+  </td></tr>
+
+  <tr><td valign="top" align="right">2</td><td valign="top" align="left">Tidy up</td></tr>
+
+  <tr><td valign="top" align="right">3</td><td valign="top" align="left">
+   <a href="#service_portable-3">Device is about to enter a stopped state (frozen)</a>
+  </td></tr>
+
+  <tr><td valign="top" align="right">4</td><td valign="top" align="left">
+   <a href="#service_portable-4">Device has left stopped state (awakened)</a>
+  </td></tr>
+
+  <tr><td valign="top" align="right">5</td><td valign="top" align="left">
+   <a href="#service_portable-5">Device wishes to be stopped (frozen)</a>
+  </td></tr>
+
+  <tr><td valign="top" align="right">other</td><td valign="top" align="left">Reserved for future expansion</td></tr>
+
+ </table>
+</td></tr>
+
+<tr><td valign="top" align="right">R3</td><td valign="top">=</td><td valign="top" align="left">bit mask of which ports are being powered down (if
+R2 = 0) (each bit set indicates port is being powered down)<br/>
+or bit mask of which ports have been powered up (if R2 = 1) (each bit set
+indicates port has been powered up)
+
+</td></tr>
+</table></dd><dt><h5>On exit</h5></dt><dd><table summary="Conditions on exit from Service call" border="0">
+<tr><td valign="top" align="right">R1</td><td valign="top">=</td><td valign="top" align="left">0 if R3 = 0, else preserved to pass on</td></tr>
+<tr><td valign="top" align="right">R2</td><td valign="top" align="left" colspan="2">preserved</td></tr>
+<tr><td valign="top" align="right">R3</td><td valign="top">=</td><td valign="top" align="left">bit mask of which ports may be powered down or up
+(each bit set indicates no objection to change of state)
+</td></tr>
+
+</table></dd><dt><h5>Use</h5></dt><dd>
+<p>This call is issued before power is removed or after power is reapplied
+to the following:</p>
+
+<p>
+<ul>
+<li>Econet (bit 0)</li>
+<li>serial buffer/oscillator (bit 3)</li>
+<li>FDC oscillator (bit 14)</li>
+</ul>
+</p>
+
+<p>If a module wishes to prevent hardware being powered down, it should
+clear the appropriate bit or bits in R3. In addition, if the resulting value
+in R3 is now zero, the module should claim the service by setting R1 to
+zero. (This is to prevent the call being unnecessarily passed round the rest
+of the modules). Otherwise the service should be passed on by preserving
+R1.</p>
+
+<p>This service call should never be claimed.</p>
+
+</dd><dt><h5>Related APIs</h5></dt><dd>None</dd></dd></dl></dd><dd><dl><dd><hr/><h2 align="right"><a name="service_portable-0">Service_Portable 0</a><br/>
+    (<acronym>Service &amp;8A</acronym>)</h2><dd>Hardware is about to be powered down</dd><dt><h5>On entry</h5></dt><dd><table summary="Conditions on entry to Service call" border="0">
+<tr><td valign="top" align="right">R1</td><td valign="top">=</td><td valign="top" align="left">reason code (&amp;8A)</td></tr>
+<tr><td valign="top" align="right">R2</td><td valign="top">=</td><td valign="top" align="left">Sub-reason code (0)</td></tr>
+
+<tr><td valign="top" align="right">R3</td><td valign="top">=</td><td valign="top" align="left">bit mask of which ports are being powered down
+(each bit set indicates port is being powered down)</td></tr>
+
+</table></dd><dt><h5>On exit</h5></dt><dd><table summary="Conditions on exit from Service call" border="0">
+<tr><td valign="top" align="right">R1</td><td valign="top">=</td><td valign="top" align="left">0 if R3 = 0, else preserved to pass on</td></tr>
+<tr><td valign="top" align="right">R2</td><td valign="top" align="left" colspan="2">preserved</td></tr>
+<tr><td valign="top" align="right">R3</td><td valign="top">=</td><td valign="top" align="left">bit mask of which ports may be powered down
+(each bit set indicates no objection to change of state)
+</td></tr>
+
+</table></dd><dt><h5>Use</h5></dt><dd>
+<p>This call is issued before power is removed from the following:</p>
+
+<p>
+<ul>
+<li>Econet (bit 0)</li>
+<li>serial buffer/oscillator (bit 3)</li>
+<li>FDC oscillator (bit 14)</li>
+</ul>
+</p>
+
+<p>If a module wishes to prevent hardware being powered down, it should
+clear the appropriate bit or bits in R3. In addition, if the resulting value
+in R3 is now zero, the module should claim the service by setting R1 to
+zero. (This is to prevent the call being unnecessarily passed round the rest
+of the modules). Otherwise the service should be passed on by preserving
+R1.</p>
+
+<p>This service call should never be claimed.</p>
+
+</dd><dt><h5>Related services</h5></dt><dd><a href="#service_portable-1">Service_Portable 1</a></dd></dd></dl></dd><dd><dl><dd><hr/><h2 align="right"><a name="service_portable-1">Service_Portable 1</a><br/>
+    (<acronym>Service &amp;8A</acronym>)</h2><dd>Hardware has been powered up</dd><dt><h5>On entry</h5></dt><dd><table summary="Conditions on entry to Service call" border="0">
+<tr><td valign="top" align="right">R1</td><td valign="top">=</td><td valign="top" align="left">reason code (&amp;8A)</td></tr>
+<tr><td valign="top" align="right">R2</td><td valign="top">=</td><td valign="top" align="left">Sub-reason code (1)</td></tr>
+
+<tr><td valign="top" align="right">R3</td><td valign="top">=</td><td valign="top" align="left">bit mask of which ports have been powered up
+(each bit set indicates port has been powered up)</td></tr>
+
+</table></dd><dt><h5>On exit</h5></dt><dd><table summary="Conditions on exit from Service call" border="0">
+<tr><td valign="top" align="right">R1</td><td valign="top">=</td><td valign="top" align="left">0 if R3 = 0, else preserved to pass on</td></tr>
+<tr><td valign="top" align="right">R2</td><td valign="top" align="left" colspan="2">preserved</td></tr>
+<tr><td valign="top" align="right">R3</td><td valign="top" align="left" colspan="2">preserved</td></tr>
+</table></dd><dt><h5>Use</h5></dt><dd>
+<p>This call is issued after power is reapplied to the following:</p>
+
+<p>
+<ul>
+<li>Econet (bit 0)</li>
+<li>serial buffer/oscillator (bit 3)</li>
+<li>FDC oscillator (bit 14)</li>
+</ul>
+</p>
+
+<p>The service should be passed on by preserving R1.</p>
+
+</dd><dt><h5>Related services</h5></dt><dd><a href="#service_portable-0">Service_Portable 0</a></dd></dd></dl></dd><dd><dl><dd><hr/><h2 align="right"><a name="service_portable-3">Service_Portable 3</a><br/>
+    (<acronym>Service &amp;8A</acronym>)</h2><dd>Device is about to enter a stopped state (frozen)</dd><dt><h5>On entry</h5></dt><dd><table summary="Conditions on entry to Service call" border="0">
+<tr><td valign="top" align="right">R1</td><td valign="top">=</td><td valign="top" align="left">reason code (&amp;8A)</td></tr>
+<tr><td valign="top" align="right">R2</td><td valign="top">=</td><td valign="top" align="left">Sub-reason code (3)</td></tr>
+
+</table></dd><dt><h5>On exit</h5></dt><dd><table summary="Conditions on exit from Service call" border="0">
+<tr><td valign="top" align="right">R1</td><td valign="top" align="left" colspan="2">preserved</td></tr>
+<tr><td valign="top" align="right">R2</td><td valign="top" align="left" colspan="2">preserved</td></tr>
+</table></dd><dt><h5>Use</h5></dt><dd>
+<p>This call is issued before the device is put into a stopped
+mode where the CPU core has been disabled. RAM continues to be
+refreshed and the system will probably be woken up at some future
+point. It is possible that the power may fail on the device before
+it is awakened. In such cases, the device may next be activated
+from a hard reset condition.</p>
+
+</dd><dt><h5>Related services</h5></dt><dd><a href="#service_portable-4">Service_Portable 4</a>, <a href="#service_portable-5">Service_Portable 5</a></dd></dd></dl></dd><dd><dl><dd><hr/><h2 align="right"><a name="service_portable-4">Service_Portable 4</a><br/>
+    (<acronym>Service &amp;8A</acronym>)</h2><dd>Device has left stopped state (awakened)</dd><dt><h5>On entry</h5></dt><dd><table summary="Conditions on entry to Service call" border="0">
+<tr><td valign="top" align="right">R1</td><td valign="top">=</td><td valign="top" align="left">reason code (&amp;8A)</td></tr>
+<tr><td valign="top" align="right">R2</td><td valign="top">=</td><td valign="top" align="left">Sub-reason code (4)</td></tr>
+<tr><td valign="top" align="right">R3</td><td valign="top">=</td><td valign="top" align="left">Failure code:
+ <table summary="Opaque table of values" border="0" cellspacing="8"><tr><th align="right" valign="bottom">Value</th><th align="left" valign="bottom">Meaning</th></tr>
+  <tr><td valign="top" align="right">0</td><td valign="top" align="left">Freeze was successful and has now returned</td></tr>
+  <tr><td valign="top" align="right">1</td><td valign="top" align="left">Freeze failed to halt IDE devices</td></tr>
+  <tr><td valign="top" align="right">2</td><td valign="top" align="left">Freeze failed to halt sound system</td></tr>
+  <tr><td valign="top" align="right">3</td><td valign="top" align="left">Freeze failed to halt display</td></tr>
+  <tr><td valign="top" align="right">4</td><td valign="top" align="left">Freeze failed to halt other devices (FDC, Econet, etc)</td></tr>
+  <tr><td valign="top" align="right">5</td><td valign="top" align="left">Freeze failed to halt some device</td></tr>
+  <tr><td valign="top" align="right">6</td><td valign="top" align="left">Freeze failed to enter the suspend state</td></tr>
+  <tr><td valign="top" align="right">other</td><td valign="top" align="left">Reserved failure states for future expansion</td></tr>
+ </table>
+</td></tr>
+
+</table></dd><dt><h5>On exit</h5></dt><dd><table summary="Conditions on exit from Service call" border="0">
+<tr><td valign="top" align="right">R1</td><td valign="top" align="left" colspan="2">preserved</td></tr>
+<tr><td valign="top" align="right">R2</td><td valign="top" align="left" colspan="2">preserved</td></tr>
+<tr><td valign="top" align="right">R3</td><td valign="top" align="left" colspan="2">preserved</td></tr>
+</table></dd><dt><h5>Use</h5></dt><dd>
+<p>This call is issued after the device returns from a stopped state.
+It may never have physically stopped the CPU if some part of the system
+failed to be shut down. In such cases, it may not be necessary to fully
+resynchronise the environment - for example, network connections may
+still be active.</p>
+
+</dd><dt><h5>Related services</h5></dt><dd><a href="#service_portable-3">Service_Portable 3</a>, <a href="#service_portable-5">Service_Portable 5</a></dd></dd></dl></dd><dd><dl><dd><hr/><h2 align="right"><a name="service_portable-5">Service_Portable 5</a><br/>
+    (<acronym>Service &amp;8A</acronym>)</h2><dd>Device wishes to be stopped (frozen)</dd><dt><h5>On entry</h5></dt><dd><table summary="Conditions on entry to Service call" border="0">
+<tr><td valign="top" align="right">R1</td><td valign="top">=</td><td valign="top" align="left">reason code (&amp;8A)</td></tr>
+<tr><td valign="top" align="right">R2</td><td valign="top">=</td><td valign="top" align="left">Sub-reason code (5)</td></tr>
+</table></dd><dt><h5>On exit</h5></dt><dd><table summary="Conditions on exit from Service call" border="0">
+<tr><td valign="top" align="right">R1</td><td valign="top">=</td><td valign="top" align="left">0 if call is being claimed to prevent freeze,
+                         preserved to accept freeze</td></tr>
+<tr><td valign="top" align="right">R2</td><td valign="top" align="left" colspan="2">preserved</td></tr>
+</table></dd><dt><h5>Use</h5></dt><dd>
+<p>This call is issued before the device is stop. Any after the
+device wishing to object to the request may claim the service.</p>
+
+</dd><dt><h5>Related services</h5></dt><dd><a href="#service_portable-3">Service_Portable 3</a>, <a href="#service_portable-4">Service_Portable 4</a></dd></dd></dl></dd></dl><hr/><dl><dt><h2><a name="section_swi_calls">SWI Calls</a></h2></dt><dd><dl><dd><hr/><h2 align="right"><a name="swi_portable_speed">Portable_Speed</a><br/>
+    (<acronym>SWI &amp;42FC0</acronym>)</h2><dd>Controls the processor speed</dd><dt><h5>On entry</h5></dt><dd><table summary="Conditions on entry to SWI" border="0">
+<tr><td valign="top" align="right">R0</td><td valign="top">=</td><td valign="top" align="left">EOR mask</td></tr>
+<tr><td valign="top" align="right">R1</td><td valign="top">=</td><td valign="top" align="left">AND mask</td></tr>
+</table></dd><dt><h5>On exit</h5></dt><dd><table summary="Conditions on exit from SWI" border="0">
+<tr><td valign="top" align="right">R0</td><td valign="top">=</td><td valign="top" align="left">old speed</td></tr>
+<tr><td valign="top" align="right">R1</td><td valign="top">=</td><td valign="top" align="left">new speed :
+ <table summary="Opaque table of values" border="0" cellspacing="8"><tr><th align="right" valign="bottom">Value</th><th align="left" valign="bottom">Meaning</th></tr>
+  <tr><td valign="top" align="right">0</td><td valign="top" align="left">Fast</td></tr>
+  <tr><td valign="top" align="right">1</td><td valign="top" align="left">Slow</td></tr>
+ </table>
+</td></tr>
+</table></dd><dt><h5>Interrupts</h5></dt><dd>Interrupts are undefined<br/>
+      Fast interrupts are enabled</dd><dt><h5>Processor mode</h5></dt><dd>Processor is in SVC mode
+  </dd><dt><h5>Re-entrancy</h5></dt><dd>SWI is not re-entrant</dd><dt><h5>Use</h5></dt><dd>
+<p>This SWI controls the processor speed, which is reduced when the system
+is idle in order to save power.</p>
+
+<p>The new speed is calculated as follows:</p>
+
+<p>new speed = (old speed AND R1) EOR R0</p>
+
+<p>Speed settings currently supported are:</p>
+
+<p>
+<table summary="Opaque table of values" border="0" cellspacing="8"><tr><th align="right" valign="bottom">Value</th><th align="left" valign="bottom">Meaning</th></tr>
+ <tr><td valign="top" align="right">0</td><td valign="top" align="left">fast</td></tr>
+ <tr><td valign="top" align="right">1</td><td valign="top" align="left">slow</td></tr>
+</table>
+</p>
+</dd><dt><h5>Related SWIs</h5></dt><dd><a href="#swi_portable_control">Portable_Control</a></dd></dd></dl></dd><dd><dl><dd><hr/><h2 align="right"><a name="swi_portable_control">Portable_Control</a><br/>
+    (<acronym>SWI &amp;42FC1</acronym>)</h2><dd>Controls various power control and miscellaneous bits</dd><dt><h5>On entry</h5></dt><dd><table summary="Conditions on entry to SWI" border="0">
+<tr><td valign="top" align="right">R0</td><td valign="top">=</td><td valign="top" align="left">EOR mask</td></tr>
+<tr><td valign="top" align="right">R1</td><td valign="top">=</td><td valign="top" align="left">AND mask</td></tr>
+</table></dd><dt><h5>On exit</h5></dt><dd><table summary="Conditions on exit from SWI" border="0">
+<tr><td valign="top" align="right">R0</td><td valign="top">=</td><td valign="top" align="left">old control</td></tr>
+<tr><td valign="top" align="right">R1</td><td valign="top">=</td><td valign="top" align="left">new control</td></tr>
+</table></dd><dt><h5>Interrupts</h5></dt><dd>Interrupts are undefined<br/>
+      Fast interrupts are enabled</dd><dt><h5>Processor mode</h5></dt><dd>Processor is in SVC mode
+  </dd><dt><h5>Re-entrancy</h5></dt><dd>SWI is not re-entrant</dd><dt><h5>Use</h5></dt><dd>
+<p>This SWI controls various power control and miscellaneous bits in the
+portable machine.</p>
+
+<p>The new control is calculated as follows:</p>
+
+<p>new control = (old control AND R1) EOR R0</p>
+
+<p>The bits in control are as follows:</p>
+
+<p>
+<table summary="A bitfield" border="0" cellspacing="8"><tr><th align="right" valign="bottom">Bit(s)</th><th align="left" valign="bottom">Meaning</th></tr>
+ <tr><td valign="top" align="right">0</td><td valign="top" align="left" colspan="2">Power to Econet enabled</td></tr>
+ <tr><td valign="top" align="right">1</td><td valign="top" align="left" colspan="2">Power to LCD display enabled</td></tr>
+ <tr><td valign="top" align="right">2</td><td valign="top" align="left" colspan="2">Power to external video display enabled</td></tr>
+ <tr><td valign="top" align="right">3</td><td valign="top" align="left" colspan="2">Power to serial buffer and oscillator enabled</td></tr>
+ <tr><td valign="top" align="right">4</td><td valign="top" align="left" colspan="2">Dual panel mode enabled</td></tr>
+ <tr><td valign="top" align="right">5, 6</td><td valign="top" align="left" colspan="2">Video clock control :
+  <table summary="Opaque table of values" border="0" cellspacing="8"><tr><th align="right" valign="bottom">Value</th><th align="left" valign="bottom">Meaning</th></tr>
+   <tr><td valign="top" align="right">0</td><td valign="top" align="left">External clock input</td></tr>
+   <tr><td valign="top" align="right">1</td><td valign="top" align="left">Crystal oscillator, divided by 2</td></tr>
+   <tr><td valign="top" align="right">2</td><td valign="top" align="left">Crystal oscillator</td></tr>
+   <tr><td valign="top" align="right">3</td><td valign="top" align="left">reserved, do not use</td></tr>
+  </table>
+ </td></tr>
+ <tr><td valign="top" align="right">7</td><td valign="top" align="left" colspan="2">Invert video clock</td></tr>
+ <tr><td valign="top" align="right">8</td><td valign="top" align="left" colspan="2">Back-light enabled</td></tr>
+ <tr><td valign="top" align="right">9</td><td valign="top" align="right">Set:</td><td valign="top" align="left">2 extra lines on display</td><tr><td/><td valign="top" align="right">Clear:</td><td valign="top" align="left">1 extra line on display</td></tr></tr>
+ 
+ <tr><td valign="top" align="right">10</td><td valign="top" align="right">Set:</td><td valign="top" align="left">2 DRAMs used for dual panel</td><tr><td/><td valign="top" align="right">Clear:</td><td valign="top" align="left">1 DRAM used for dual panel</td></tr></tr>
+ 
+ <tr><td valign="top" align="right">11 - 13</td><td valign="top" align="left" colspan="2">Reserved</td></tr>
+ <tr><td valign="top" align="right">14</td><td valign="top" align="left" colspan="2">Power to FDC oscillator enabled</td></tr>
+ <tr><td valign="top" align="right">15</td><td valign="top" align="left" colspan="2">Reserved</td></tr>
+ <tr><td valign="top" align="right">16</td><td valign="top" align="left" colspan="2">LCD palette set up for inverse video</td></tr>
+ <tr><td valign="top" align="right">17</td><td valign="top" align="left" colspan="2">Internal tracker ball enabled</td></tr>
+ <tr><td valign="top" align="right">18</td><td valign="top" align="left" colspan="2">External mouse enabled</td></tr>
+ <tr><td valign="top" align="right">19</td><td valign="top" align="left" colspan="2">Power to external keyboard and mouse enabled</td></tr>
+ <tr><td valign="top" align="right">20 - 31</td><td valign="top" align="left" colspan="2">Reserved</td></tr>
+</table>
+</p>
+
+<p>Reserved bits must not be modified, nor assumed to read any particular
+value.</p>
+
+<p>Note that the 82C711 has one oscillator which is used by the serial
+subunit and by the floppy disc controller (FDC). Power to the oscillator is
+removed only if bits 3 and 14 are both clear.</p>
+
+<p>On some computers the power to the oscillator cannot be removed because
+the same oscillator drives other parts of the system (eg IOEB).</p>
+
+<p>If this call results in bits 0, 3 or 14 changing (ie power being removed
+or applied to the serial buffer/oscillator, Econet or FDC oscillator), then
+Service_Portable is issued (see
+<a href="#service_portable-0">Service_Portable 0</a> and
+<a href="#service_portable-1">Service_Portable 1</a>).</p>
+
+</dd><dt><h5>Related SWIs</h5></dt><dd><a href="#swi_portable_speed">Portable_Speed</a></dd></dd></dl></dd><dd><dl><dd><hr/><h2 align="right"><a name="swi_portable_readbmuvariable">Portable_ReadBMUVariable</a><br/>
+    (<acronym>SWI &amp;42FC2</acronym>)</h2><dd>Reads Battery Management Unit variables</dd><dt><h5>On entry</h5></dt><dd><table summary="Conditions on entry to SWI" border="0">
+<tr><td valign="top" align="right">R0</td><td valign="top">=</td><td valign="top" align="left">BMU variable number</td></tr>
+</table></dd><dt><h5>On exit</h5></dt><dd><table summary="Conditions on exit from SWI" border="0">
+<tr><td valign="top" align="right">R0</td><td valign="top" align="left" colspan="2">preserved</td></tr>
+<tr><td valign="top" align="right">R1</td><td valign="top">=</td><td valign="top" align="left">value of variable</td></tr>
+</table></dd><dt><h5>Interrupts</h5></dt><dd>Interrupts are enabled except if R0 = 10<br/>
+      Fast interrupts are enabled</dd><dt><h5>Processor mode</h5></dt><dd>Processor is in SVC mode
+  </dd><dt><h5>Re-entrancy</h5></dt><dd>SWI is not re-entrant</dd><dt><h5>Use</h5></dt><dd>
+<p>This SWI reads Battery Management Unit variables. Any variable which is
+not supported will return an error.</p>
+
+<p>The BMU variable numbers are:</p>
+
+<p>
+<table summary="Opaque table of values" border="0" cellspacing="8"><tr><th align="right" valign="bottom">Variable</th><th align="left" valign="bottom">Read/Write</th><th align="left" valign="bottom">Description</th></tr>
+ <tr><td valign="top" align="right">0</td><td valign="top" align="left">R</td><td valign="top" align="left">version number and memory map of BMU microcode</td></tr>
+ <tr><td valign="top" align="right">1</td><td valign="top" align="left">R</td><td valign="top" align="left">nominal battery capacity</td></tr>
+ <tr><td valign="top" align="right">2</td><td valign="top" align="left">R</td><td valign="top" align="left">measured battery capacity</td></tr>
+ <tr><td valign="top" align="right">3</td><td valign="top" align="left">R</td><td valign="top" align="left">used battery capacity</td></tr>
+ <tr><td valign="top" align="right">4</td><td valign="top" align="left">R</td><td valign="top" align="left">usable battery capacity</td></tr>
+ <tr><td valign="top" align="right">5</td><td valign="top" align="left">R</td><td valign="top" align="left">reserved</td></tr>
+ <tr><td valign="top" align="right">6</td><td valign="top" align="left">R/W</td><td valign="top" align="left">charge estimate</td></tr>
+ <tr><td valign="top" align="right">7</td><td valign="top" align="left">R</td><td valign="top" align="left">instantaneous voltage</td></tr>
+ <tr><td valign="top" align="right">8</td><td valign="top" align="left">R</td><td valign="top" align="left">instantaneous current</td></tr>
+ <tr><td valign="top" align="right">9</td><td valign="top" align="left">R</td><td valign="top" align="left">instantaneous temperature</td></tr>
+ <tr><td valign="top" align="right">10</td><td valign="top" align="left">R</td><td valign="top" align="left">flags as follows:
+  <table summary="A bitfield" border="0" cellspacing="8"><tr><th align="right" valign="bottom">Bit(s)</th><th align="left" valign="bottom">Meaning</th></tr>
+   <tr><td valign="top" align="right">0</td><td valign="top" align="left" colspan="2">battery has been replaced</td></tr>
+   <tr><td valign="top" align="right">1</td><td valign="top" align="left" colspan="2">lid is open</td></tr>
+   <tr><td valign="top" align="right">2</td><td valign="top" align="left" colspan="2">threshold 2 reached (battery is flat)</td></tr>
+   <tr><td valign="top" align="right">3</td><td valign="top" align="left" colspan="2">threshold 1 reached (battery is low)</td></tr>
+   <tr><td valign="top" align="right">4</td><td valign="top" align="left" colspan="2">charging system fault</td></tr>
+   <tr><td valign="top" align="right">5</td><td valign="top" align="left" colspan="2">charge state is known</td></tr>
+   <tr><td valign="top" align="right">6</td><td valign="top" align="left" colspan="2">battery present (set when battery is present, whether in use, charging or idle)</td></tr>
+   <tr><td valign="top" align="right">7</td><td valign="top" align="left" colspan="2">power connected (set when external power is available, whether charging or not)</td></tr>
+   <tr><td valign="top" align="right">8</td><td valign="top" align="left" colspan="2">battery charging (set when external power is being used to charge the battery)</td></tr>
+   <tr><td valign="top" align="right">9</td><td valign="top" align="left" colspan="2">battery failing (set when the battery has been detected as aging and no longer holding charge)</td></tr>
+  </table>
+ </td></tr>
+ <tr><td valign="top" align="right">11</td><td valign="top" align="left">R</td><td valign="top" align="left">charge rate (bits 4 to 7)</td></tr>
+ 
+ <tr><td valign="top" align="right">12</td><td valign="top" align="left">R</td><td valign="top" align="left">charge current</td></tr>
+ <tr><td valign="top" align="right">13</td><td valign="top" align="left">R</td><td valign="top" align="left">discharge current</td></tr>
+ <tr><td valign="top" align="right">14</td><td valign="top" align="left">R</td><td valign="top" align="left">voltage</td></tr>
+ <tr><td valign="top" align="right">15</td><td valign="top" align="left">R</td><td valign="top" align="left">temperature 1</td></tr>
+ <tr><td valign="top" align="right">16</td><td valign="top" align="left">R</td><td valign="top" align="left">temperature 2</td></tr>
+ <tr><td valign="top" align="right">17</td><td valign="top" align="left">R</td><td valign="top" align="left">charge level</td></tr>
+ <tr><td valign="top" align="right">18</td><td valign="top" align="left">R</td><td valign="top" align="left">status flags (as variable 10)</td></tr>
+ <tr><td valign="top" align="right">19</td><td valign="top" align="left">R</td><td valign="top" align="left">input signals</td></tr>
+ <tr><td valign="top" align="right">20</td><td valign="top" align="left">R</td><td valign="top" align="left">battery capacity</td></tr>
+ 
+ <tr><td valign="top" align="right">21</td><td valign="top" align="left">R</td><td valign="top" align="left">battery time remaining in seconds</td></tr>
+ <tr><td valign="top" align="right">22</td><td valign="top" align="left">R</td><td valign="top" align="left">maximum battery life in seconds</td></tr>
+</table>
+</p>
+
+<p>Reading any variable except the flags (variable 10) will enable IRQs (the
+flags are read from a soft copy).</p>
+
+<p>Variables 0-11 were implemented within the A4 version of the Portable
+module. Variables 12-20 and selected variables from 0-11 were implemented
+within the Stork version of the Portable module. Variables 21-22 are
+implemented within the Virtual RiscPC version of the Portable module.
+</p>
+
+<p>Variables which are not supported will return with the V flag set and R0
+point to a standard error block. Applications trying to use the more
+advanced features and finding they are not available should attempt to fall
+back to earlier methods.</p>
+
+</dd><dt><h5>Related SWIs</h5></dt><dd><a href="#swi_portable_writebmuvariable">Portable_WriteBMUVariable</a></dd></dd></dl></dd><dd><dl><dd><hr/><h2 align="right"><a name="swi_portable_writebmuvariable">Portable_WriteBMUVariable</a><br/>
+    (<acronym>SWI &amp;42FC3</acronym>)</h2><dd>Writes Battery Management Unit variables</dd><dt><h5>On entry</h5></dt><dd><table summary="Conditions on entry to SWI" border="0">
+<tr><td valign="top" align="right">R0</td><td valign="top">=</td><td valign="top" align="left">BMU variable number</td></tr>
+<tr><td valign="top" align="right">R1</td><td valign="top">=</td><td valign="top" align="left">new value of variable</td></tr>
+</table></dd><dt><h5>On exit</h5></dt><dd><table summary="Conditions on exit from SWI" border="0">
+<tr><td valign="top" align="right">R0</td><td valign="top" align="left" colspan="2">preserved</td></tr>
+<tr><td valign="top" align="right">R1</td><td valign="top" align="left" colspan="2">preserved</td></tr>
+</table></dd><dt><h5>Interrupts</h5></dt><dd>Interrupts are undefined<br/>
+      Fast interrupts are enabled</dd><dt><h5>Processor mode</h5></dt><dd>Processor is in SVC mode
+  </dd><dt><h5>Re-entrancy</h5></dt><dd>SWI is not re-entrant</dd><dt><h5>Use</h5></dt><dd>
+<p>This SWI writes Battery Management Unit variables.</p> <p>The variable
+numbers are as for <a href="#swi_portable_readbmuvariable">Portable_ReadBMUVariable</a>.
+Variables not marked with a 'W' should not be written.</p>
+</dd><dt><h5>Related SWIs</h5></dt><dd><a href="#swi_portable_readbmuvariable">Portable_ReadBMUVariable</a></dd></dd></dl></dd><dd><dl><dd><hr/><h2 align="right"><a name="swi_portable_commandbmu">Portable_CommandBMU</a><br/>
+    (<acronym>SWI &amp;42FC4</acronym>)</h2><dd>Issues a command to the Battery Management Unit</dd><dt><h5>On entry</h5></dt><dd><table summary="Conditions on entry to SWI" border="0">
+<tr><td valign="top" align="right">R0</td><td valign="top">=</td><td valign="top" align="left">reason code
+ <table summary="Opaque table of values" border="0" cellspacing="8"><tr><th align="right" valign="bottom">Value</th><th align="left" valign="bottom">Meaning</th></tr>
+  <tr><td valign="top" align="right">1</td><td valign="top" align="left">Remove power</td></tr>
+  <tr><td valign="top" align="right">2</td><td valign="top" align="left">Reserved</td></tr>
+  <tr><td valign="top" align="right">3</td><td valign="top" align="left">Reserved</td></tr>
+  <tr><td valign="top" align="right">4</td><td valign="top" align="left">Set autostart (R1 = delay in minutes - 1; eg 0 for a 1 minute delay</td></tr>
+  <tr><td valign="top" align="right">5</td><td valign="top" align="left">Turn off AC power</td></tr>
+  <tr><td valign="top" align="right">6</td><td valign="top" align="left">Turn on AC power</td></tr>
+  <tr><td valign="top" align="right">7</td><td valign="top" align="left">Disable power management status</td></tr>
+ </table>
+</td></tr>
+<tr><td valign="top" align="right">R0-5</td><td valign="top">=</td><td valign="top" align="left">Dependant on reason code</td></tr>
+</table></dd><dt><h5>On exit</h5></dt><dd><table summary="Conditions on exit from SWI" border="0">
+<tr><td valign="top" align="right">R0-5</td><td valign="top" align="left" colspan="2">preserved</td></tr>
+</table></dd><dt><h5>Interrupts</h5></dt><dd>Interrupts are undefined<br/>
+      Fast interrupts are enabled</dd><dt><h5>Processor mode</h5></dt><dd>Processor is in SVC mode
+  </dd><dt><h5>Re-entrancy</h5></dt><dd>SWI is not re-entrant</dd><dt><h5>Use</h5></dt><dd>
+<p>This SWI issues a command to the Battery Management Unit. The values of
+variables after a command may not change immediately after this command is
+issued.</p>
+</dd><dt><h5>Related APIs</h5></dt><dd>None</dd></dd></dl></dd><dd><dl><dd><hr/><h2 align="right"><a name="swi_portable_readfeatures">Portable_ReadFeatures</a><br/>
+    (<acronym>SWI &amp;42FC5</acronym>)</h2><dd>Read feature set of the portable module</dd><dt><h5>On entry</h5></dt><dd>None</dd><dt><h5>On exit</h5></dt><dd><table summary="Conditions on exit from SWI" border="0">
+<tr><td valign="top" align="right">R1</td><td valign="top">=</td><td valign="top" align="left">Features of the portable module :
+ <table summary="A bitfield" border="0" cellspacing="8"><tr><th align="right" valign="bottom">Bit(s)</th><th align="left" valign="bottom">Meaning</th></tr>
+  <tr><td valign="top" align="right">0</td><td valign="top" align="left" colspan="2">Portable_Speed SWI is implemented</td></tr>
+  <tr><td valign="top" align="right">1-3</td><td valign="top" align="left" colspan="2">Reserved, must be zero</td></tr>
+  <tr><td valign="top" align="right">4</td><td valign="top" align="left" colspan="2">Portable_Idle SWI is implemented</td></tr>
+  <tr><td valign="top" align="right">5</td><td valign="top" align="left" colspan="2">Portable_Stop SWI is implemented</td></tr>
+  <tr><td valign="top" align="right">6-31</td><td valign="top" align="left" colspan="2">Reserved, must be zero</td></tr>
+ </table>
+</td></tr>
+</table></dd><dt><h5>Interrupts</h5></dt><dd>Interrupts are undefined<br/>
+      Fast interrupts are enabled</dd><dt><h5>Processor mode</h5></dt><dd>Processor is in SVC mode
+  </dd><dt><h5>Re-entrancy</h5></dt><dd>SWI is not re-entrant</dd><dt><h5>Use</h5></dt><dd>
+<p>This SWI is used to read the features provided by the Portable module.
+Where this module is not present, or this SWI generates an error if called,
+clients should treat the features as being 0.</p>
+
+</dd><dt><h5>Related APIs</h5></dt><dd>None</dd></dd></dl></dd><dd><dl><dd><hr/><h2 align="right"><a name="swi_portable_idle">Portable_Idle</a><br/>
+    (<acronym>SWI &amp;42FC6</acronym>)</h2><dd>Informs the portable module that the system is currently idle</dd><dt><h5>On entry</h5></dt><dd>None</dd><dt><h5>On exit</h5></dt><dd>None</dd><dt><h5>Interrupts</h5></dt><dd>Interrupts are undefined<br/>
+      Fast interrupts are enabled</dd><dt><h5>Processor mode</h5></dt><dd>Processor is in SVC mode
+  </dd><dt><h5>Re-entrancy</h5></dt><dd>SWI is not re-entrant</dd><dt><h5>Use</h5></dt><dd>
+<p>This SWI places the system into idle mode. The CPU clock is stopped, but
+all other clocks run normally. This means the Video display and all the IO
+channels are active, the DRAM is refreshed, but the system consumes less
+power as the CPU is inactive. The CPU remains in this state until it
+receives a FIQ or IRQ interrupt (eg from the keyboard, floppy, centi-second
+timer etc).</p>
+
+<p>Essentially it requests that the environment be stopped until 'something
+interesting' happens.</p>
+
+</dd><dt><h5>Related APIs</h5></dt><dd>None</dd></dd></dl></dd><dd><dl><dd><hr/><h2 align="right"><a name="swi_portable_stop">Portable_Stop</a><br/>
+    (<acronym>SWI &amp;42FC7</acronym>)</h2><dd>Stops (freezes) the Portable</dd><dt><h5>On entry</h5></dt><dd>None</dd><dt><h5>On exit</h5></dt><dd><table summary="Conditions on exit from SWI" border="0">
+<tr><td valign="top" align="right">R0</td><td valign="top">=</td><td valign="top" align="left">Reason for wake up :
+ <table summary="Opaque table of values" border="0" cellspacing="8"><tr><th align="right" valign="bottom">Value</th><th align="left" valign="bottom">Meaning</th></tr>
+  <tr><td valign="top" align="right">1</td><td valign="top" align="left">Keyboard interrupt</td></tr>
+  <tr><td valign="top" align="right">2</td><td valign="top" align="left">RTC timer interrupt</td></tr>
+  <tr><td valign="top" align="right">other</td><td valign="top" align="left">Reserved</td></tr>
+ </table>
+</td></tr>
+</table></dd><dt><h5>Interrupts</h5></dt><dd>Interrupts are disabled<br/>
+      Fast interrupts are disabled</dd><dt><h5>Processor mode</h5></dt><dd>Processor is in SVC mode
+  </dd><dt><h5>Re-entrancy</h5></dt><dd>SWI is not re-entrant</dd><dt><h5>Use</h5></dt><dd>
+
+<p>This SWI places the machine into a 'standby' state, from which it can be
+awoken by certain interrupts. DRAM is set to self-refresh, and the system
+placed into stop mode (all clocks are stopped). Execution continues only
+on receipt of an external wakeup event from the keyboard or
+real-time-clock. Normal FIQ or IRQ or centi-second timer events cannot
+happen because the IO system is not clocked.</p>
+
+<p>Freezing of the machine may be prevented by modules through the service
+call <a href="#service_portable-5">Service_Portable 5</a>.
+This service is issued prior to attempts to freeze the machine. If no clients
+object to this service,
+<a href="#service_portable-3">Service_Portable 3</a> will be issued
+and the machine shut down. Upon an interrupt,
+<a href="#service_portable-4">Service_Portable 4</a> will be
+issued to notify clients that the power has been restored and a
+period of time has elapsed during which interrupts have not happened.
+</p>
+
+</dd><dt><h5>Related APIs</h5></dt><dd>None</dd></dd></dl></dd><dd><dl><dd><hr/><h2 align="right"><a name="swi_portable_status">Portable_Status</a><br/>
+    (<acronym>SWI &amp;42FC8</acronym>)</h2><dd>Reads the status of the Portable environment</dd><dt><h5>On entry</h5></dt><dd>None</dd><dt><h5>On exit</h5></dt><dd><table summary="Conditions on exit from SWI" border="0">
+<tr><td valign="top" align="right">R0</td><td valign="top">=</td><td valign="top" align="left">Status of the Portable environment :
+ <table summary="A bitfield" border="0" cellspacing="8"><tr><th align="right" valign="bottom">Bit(s)</th><th align="left" valign="bottom">Meaning</th></tr>
+  <tr><td valign="top" align="right">0</td><td valign="top" align="left" colspan="2">Device is currently docked</td></tr>
+  <tr><td valign="top" align="right">1</td><td valign="top" align="left" colspan="2">Device has external floppy disc drive connected</td></tr>
+  <tr><td valign="top" align="right">2</td><td valign="top" align="left" colspan="2">Device has tracker ball connected (rather than mouse)</td></tr>
+  <tr><td valign="top" align="right">3</td><td valign="top" align="left" colspan="2">Device has internal display in use</td></tr>
+  <tr><td valign="top" align="right">4-31</td><td valign="top" align="left" colspan="2">Reserved, must be zero</td></tr>
+ </table>
+</td></tr>
+</table></dd><dt><h5>Interrupts</h5></dt><dd>Interrupts are undefined<br/>
+      Fast interrupts are enabled</dd><dt><h5>Processor mode</h5></dt><dd>Processor is in SVC mode
+  </dd><dt><h5>Re-entrancy</h5></dt><dd>SWI is not re-entrant</dd><dt><h5>Use</h5></dt><dd>
+<p>This SWI is used to read the status of the Portable environment. This
+allows applications to modify their behaviour, or for modules to configure
+their operations based on the environment in which the device is
+situated.</p>
+</dd><dt><h5>Related APIs</h5></dt><dd>None</dd></dd></dl></dd></dl><hr/></body>
+
+
+
+<dl><dt><h2><a name="metadata">Document information</a></h2></dt><dd><table summary="Meta information table"><tr><th align="right" valign="top">Maintainer(s):</th><td><div>RISCOS Ltd &lt;<a href="mailto:developer@riscos.com">developer@riscos.com</a>&gt;</div></td></tr><tr><th align="right" valign="top">History:</th><td><table border="0" summary="Document history"><tr><th align="left">Revision</th><th align="left">Date</th><th align="left">Author</th><th align="left">Changes</th></tr>
+  <tr><td valign="top">1</td><td valign="top" style="white-space: nowrap;">02 May 2003</td><td valign="top">ROL</td><td valign="top"><strong>Converted from PRM</strong><br/></td></tr>
+  <tr><td valign="top">2</td><td valign="top" style="white-space: nowrap;">01 Sep 2003</td><td valign="top">ROL</td><td valign="top"><strong>Tided up</strong><br/><ul>
+   <li>Updated bit fields to be more readable.</li>
+   <li>Reformatted some of the text to be more readable.</li>
+  </ul></td></tr>
+  <tr><td valign="top">3</td><td valign="top" style="white-space: nowrap;">02 Sep 2003</td><td valign="top">ROL</td><td valign="top"><strong>Updated with Stork details</strong><br/><ul>
+   <li>SWIs ReadFeatures, Idle, Stop and Status documented.</li>
+   <li>Service_Portable expanded to cover reasons 2-5.</li>
+  </ul></td></tr>
+  <tr><td valign="top">4</td><td valign="top" style="white-space: nowrap;">02 Sep 2003</td><td valign="top">ROL</td><td valign="top"><strong>BMU variables updated</strong><br/><ul>
+   <li>BMU variables specific to Stork have now been added.</li>
+  </ul></td></tr>
+  <tr><td valign="top">5</td><td valign="top" style="white-space: nowrap;">12 Mar 2004</td><td valign="top">ROL</td><td valign="top"><strong>Tidy up</strong><br/><ul>
+   <li>Miscellaneous tidy up of the documentation.</li>
+   <li>Corrected grey scale values.</li>
+   <li>Added note about missing Portable Event details (pending Event vector documentation).</li>
+  </ul></td></tr>
+ </table></td></tr><tr><th align="right" valign="top">Disclaimer:</th><td align="left" valign="top">
+  <p>
+Copyright © Pace Micro Technology plc, 2001.<br/>
+Portions copyright © RISCOS Ltd, 2001-2004.<br/>
+Published by RISCOS Limited.<br/>
+No part of this publication may be reproduced or transmitted, in any form
+or by any means, electronic, mechanical, photocopying, recording or
+otherwise, or stored in any retrieval system of any nature, without the
+written permission of the copyright holder and the publisher, application for
+which shall be made to the publisher.<br/>
+</p>
+ </td></tr></table></dd></dl><hr/></html>
