@@ -8,6 +8,7 @@
 variables:
   GIT_STRATEGY: clone
   GIT_SUBMODULE_STRATEGY: none
+  BUILD32: 1
 
 
 # Common definitions for the jobs
@@ -34,7 +35,7 @@ export-libs-riscos:
   <<: *common
   stage: export
   script:
-    - ci/build.sh libs
+    - ci/build.sh libs --upload
 
 
 #### Builds ####
@@ -42,7 +43,7 @@ build-modules-riscos:
   <<: *common
   stage: build
   script:
-    - ci/build.sh libs ram
+    - ci/build.sh install --upload
 
 
 #### Stages to execute ####
