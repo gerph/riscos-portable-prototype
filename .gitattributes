@@ -1,8 +1,9 @@
-c/* gitlab-language=c
-**/c/* gitlab-language=c
-h/* gitlab-language=c
-**/h/* gitlab-language=c
-hdr/* gitlab-language=armasm
-**/hdr/* gitlab-language=armasm
-cmhg/* gitlab-language=c
-**/cmhg/* gitlab-language=c
+c/* gitlab-language=c linguist-language=c
+**/c/* gitlab-language=c linguist-language=c
+h/* gitlab-language=c linguist-language=c
+**/h/* gitlab-language=c linguist-language=c
+hdr/* gitlab-language=armasm linguist-language=assembly
+**/hdr/* gitlab-language=armasm linguist-language=assembly
+cmhg/* gitlab-language=c linguist-language=c
+**/cmhg/* gitlab-language=c linguist-language=c
+VersionNum gitlab-language=c linguist-language=c

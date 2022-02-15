@@ -1,9 +1,8 @@
-aof/
-rm/
-oz/
-oz32/
 /artifacts/
 /ci-logs/
 /riscos-build/
-rm32/
 h/modhead
+oz/*
+oz32/*
+rm/*
+rm32/*
