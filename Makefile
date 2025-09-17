@@ -4,7 +4,7 @@
 #
 # Program specific options:
 #
-COMPONENT  = Portable
+COMPONENT  = PortablePrototype
 CLEANTARGET = cleantarget
 EXPORTS    = ${EXP_C_H}.${COMPONENT}SWIs \
 			 ${EXP_C_H}.${COMPONENT}Vars \
