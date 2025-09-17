@@ -8,3 +8,4 @@ rm/*
 rm32/*
 oz64/*
 rm64/*
+.rotransform
