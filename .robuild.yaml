@@ -22,10 +22,10 @@ jobs:
     # Commands which should be executed to perform the build.
     # The build will terminate if any command returns a non-0 return code or an error.
     script:
-      - amu -f Makefile ram  
+      - amu -f Makefile ram
 
       - echo +++ Test that it loads
-      - rmload rm32.Portable
+      - rmload rm32.PortablePrototype
       - echo +++ Loaded successfully
 
     # Outputs from the build are defined in artifacts
